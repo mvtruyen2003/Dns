@@ -29,8 +29,6 @@ DOMAIN-SUFFIX,ads-fa.spotify.com,REJECT
 DOMAIN-SUFFIX,audio-ak-spotify-com.akamaized.net,REJECT
 DOMAIN-SUFFIX,heads-fa.spotify.com,REJECT
 
-# === TRAFFIC VIỆT NAM (ĐƯỜNG DẪN MỚI FIX LỖI 404) ===
-RULE-SET,https://raw.githubusercontent.com/Loyalsoldier/clash-rules/master/cnip.txt,DIRECT
 
 # Các kết nối còn lại đi theo thiết bị đặt
 # === YOUTUBE - Block ads and tracking ===
