@@ -53,8 +53,12 @@ http-request ^https?:\/\/spclient\.wg\.spotify\.com\/ad-logic\/ header-del If-No
 # === YOUTUBE PREMIUM (Xem nền + Chặn Ad + PiP) ===
 youtube.request = type=http-request, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|reel\/reel_watch_sequence|get_watch), requires-body=1, max-size=-1, binary-body-mode=1, engine=jsc, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/youtube.response.js
 youtube.response = type=http-response, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch), requires-body=1, max-size=-1, binary-body-mode=1, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/youtube.response.js, argument="{"lyricLang":"vi","captionLang":"vi","blockUpload":false,"blockImmersive":false,"debug":false}"
-# Spotify AdBlock Script
-Spotify-AdBlock = type=http-response,pattern=^https:\/\/spclient\.wg\.spotify\.com\/(ad-logic|ads)\/,requires-body=1,max-size=0,script-path= https://raw.githubusercontent.com/mvtruyen2003/Dns/refs/heads/main/Spotify.js
+
+# 1. Script chặn quảng cáo Spotify
+Spotify-AdBlock = type=http-response,pattern=^https:\/\/spclient\.wg\.spotify\.com\/(ad-logic|ads)\/,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/mvtruyen2003/Dns/refs/heads/main/Spotify.js
+
+# 2. Script mở khóa tính năng Premium hiển thị trong App
+Spotify-Premium = type=http-response,pattern=^https:\/\/spclient\.wg\.spotify\.com\/(bootstrap\/v1\/bootstrap|bootstrap\/v1\/bootstrap\?|product-state\/v1\/property\/native-premium-shuffle-v2|product-state\/v1\/values),requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/mvtruyen2003/Dns/refs/heads/main/Spotify_json.js
 # === SOUNDCLOUD GO+ ===
 soundcloud-response = type=http-response, pattern=^https:\/\/api-mobile\.soundcloud\.com\/configuration\/ios$, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/SoundCloudGoPlus.js, requires-body=true, timeout=15
 
