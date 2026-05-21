@@ -1,7 +1,7 @@
 [General]
 ipv6 = false
 # Địa chỉ DNS Cloudflare Zero Trust cá nhân của bạn
-dns-server = tls://euw4882anx.cloudflare-gateway.com
+dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
 
 # Bỏ qua các địa chỉ IP nội bộ để không làm lỗi kết nối nhà thông minh (Smarthome), AirDrop
 skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local, captive.apple.com
