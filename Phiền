@@ -66,8 +66,6 @@ soundcloud-response = type=http-response, pattern=^https:\/\/api-mobile\.soundcl
 picsart-response = type=http-response, pattern=^https:\/\/api\.picsart\.com\/gw-v2\/shop\/subscription\/apple\/purchases, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/PicsArt.js, requires-body=true, max-size=0, timeout=60
 picsart-storages = type=http-response, pattern=^https:\/\/api\.picsart\.com\/gw-v2\/cloud-storage\/v1\/me\/storages, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/PicsArt.js, requires-body=true, max-size=0, timeout=60
 
-# === LIGHTROOM PREMIUM ===
-lightroom-response = type=http-response, pattern=^https:\/\/photos\.adobe\.io\/v2\/accounts, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/lightroom.js, requires-body=true, timeout=10, max-size=131072
 
 # === PHOTOSHOP EXPRESS PREMIUM ===
 photoshop-response = type=http-response, pattern=^https:\/\/lcs-mobile-cops\.adobe\.io\/mobile_profile, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/photoshop.js, requires-body=true, timeout=10, max-size=131072
@@ -80,8 +78,6 @@ revenuecat-backup = type=http-response, pattern=^https:\/\/api\.rc-backup\.com\/
 # === VSCO PREMIUM ===
 vsco-response = type=http-response, pattern=^https:\/\/vsco\.co\/api\/subscriptions\/2\.1\/user-subscriptions, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/VSCO.js, requires-body=true, timeout=10, max-size=131072
 
-# === WINK VIP ===
-wink-response = type=http-response, pattern=^https?:\/\/api-sub\.meitu\.com\/v2\/user\/vip_info_by_group\.json, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/WinkVipCrack.js, requires-body=true, timeout=10
 
 # === TRUECALLER PREMIUM ===
 truecaller-response = type=http-response, pattern=^https:\/\/premium-(.+)\.truecaller\.com\/v\d\/(subscriptions|products\/apple), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/main/Module/js/TrueCaller.js, requires-body=true, timeout=10
