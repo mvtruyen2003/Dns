@@ -7,9 +7,10 @@ dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
 skip-proxy = 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, localhost, *.local, captive.apple.com
 
 # Tối ưu hóa hiệu năng hệ thống
-proxy-timeout = 5000
+proxy-timeout = 3000
 tcp-fast-open = true
 allow-wifi-access = false
+tun-mtu = 1450
 
 [Rule]
 # === CHẶN QUẢNG CÁO BIỂU NGỮ (BANNER ADS) ===
