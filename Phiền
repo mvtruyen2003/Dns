@@ -1,9 +1,10 @@
 [General]
+fallback-dns-server = 
 ipv6 = false
 
 # 1. KÍCH HOẠT DOH ZERO TRUST CỦA BẠN (Sửa dns-server thành encrypted-dns-server)
 # Dùng 1.1.1.1 và 8.8.8.8 làm DNS phụ để làm mồi (Bootstrap) kích hoạt DoH lúc đầu
-dns-server = 1.1.1.1, 8.8.8.8
+dns-server = 
 encrypted-dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
 
 # Tắt tính năng lấy DNS hệ thống để ép 100% truy vấn phải đi qua bộ lọc Zero Trust
