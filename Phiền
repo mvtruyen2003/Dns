@@ -97,10 +97,10 @@ meitu-response = type=http-response, pattern=^https?:\/\/(h5|api)\.xiuxiu\.meitu
 sub-store-core = type=http-request, pattern=^https?:\/\/sub\.store\/((download)|api\/(preview|sync|(utils\/node-info))), script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js, requires-body=true, timeout=120
 sub-store-simple = type=http-request, pattern=^https?:\/\/sub\.store, script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js, requires-body=true, timeout=10
 sub-store-sync = type=cron, cronexp=0 0 * * *, wake-system=1, timeout=120, script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/cron-sync-artifacts.min.js
- 
 
-# Lưu ý: Thêm thuộc tính argument=type=document-start để script chạy trước khi trang web kịp quét
-bypass_adblock = type=http-request,pattern=^https?://rophim1\.vip/,script-path=bypass_probe.js,argument=type=document-start
+# Bắt buộc phải là type=http-response và có requires-body=1
+anti_adblock_v2 = type=http-response,pattern=^https?://rophim1\.vip/,requires-body=1,script-path=bypass_v2.js
+
 
 [MITM]
 ca-passphrase = pWop7mlH
