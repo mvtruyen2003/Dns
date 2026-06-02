@@ -1,0 +1,1220 @@
+#!name=👑 Nguyễn Ngọc Anh Tú 🌸 ⁕ Ultimate Premium ⁕
+#!desc=🚀 Mở khóa 250+ App VIP (Spotify, Locket, CapCut...). 🛡️ Chặn sạch Ads & Tracking. ⚡ Tối ưu DNS, AI & Gaming. 🏦 41+ Banking & Ví VN. 🎬 Streaming & Social.
+#!version=1.8.1
+#!date=2026-06-02
+#!author=Nguyễn Ngọc Anh Tú (z3rokaze)
+#!homepage=https://github.com/ekaznyra/NguyenNgocAnhTu
+#!icon=https://raw.githubusercontent.com/Koolson/Qure/master/IconSet/Color/VIP.png
+#!system=ios
+
+[General]
+# ============================================================
+# === [General] TỐI ƯU CHUẨN SHADOWROCKET (v1.8.1)         ===
+# ============================================================
+
+# --- BYPASS SYSTEM: bỏ qua traffic hệ thống iOS ---
+# Bắt buộc nên bật trên Shadowrocket: tránh trễ Push Notification (APNs),
+# tránh treo các tiến trình nền của hệ thống. Mặc định khuyến nghị = true.
+bypass-system = true
+
+# --- DNS MÃ HÓA (DoH) — CHẶN QUẢNG CÁO TẦNG DNS ---
+# Mặc định dùng AdGuard DNS: chặn ads + trackers + phishing ngay ở tầng DNS
+# (lớp bảo vệ thêm, bổ trợ cho các rule REJECT bên dưới). Có "system" fallback.
+# Lưu ý: AdGuard KHÔNG chặn domain API của các script unlock (revenuecat/itunes...),
+# nên không ảnh hưởng tính năng mở khóa app.
+dns-server = https://dns.adguard-dns.com/dns-query, system
+
+# --- FALLBACK DNS: khi DoH ở trên lỗi/timeout ---
+fallback-dns-server = system
+
+# ------------------------------------------------------------
+# TÙY CHỌN DNS THAY THẾ (muốn dùng cái nào: bỏ "# " đầu dòng đó,
+# và thêm "# " vào đầu dòng dns-server AdGuard ở trên):
+#   • ControlD (chặn ads + trackers + malware):
+# dns-server = https://freedns.controld.com/p2, system
+#   • AdGuard Family (chặn thêm nội dung 18+ & ép Safe Search):
+# dns-server = https://family.adguard-dns.com/dns-query, system
+#   • Cấu hình GỐC — Google + Cloudflare + Quad9 (chỉ mã hóa, KHÔNG chặn ads):
+# dns-server = https://dns.google/dns-query, https://cloudflare-dns.com/dns-query, https://dns.quad9.net/dns-query, system
+# ------------------------------------------------------------
+
+# --- PRIVATE IP ANSWER: chống DNS bị giả mạo về IP nội bộ ---
+# Nếu domain phân giải ra IP private, Shadowrocket coi như bị hijack
+# và ép đi proxy. Cần thiết cho Captive Portal & GeoIP hoạt động đúng.
+private-ip-answer = true
+
+# --- ICMP AUTO REPLY: tự trả lời ping ---
+# Giúp lệnh ping/đo mạng phản hồi ngay, không vòng qua proxy.
+icmp-auto-reply = true
+
+# --- UDP FALLBACK KHI NODE KHÔNG HỖ TRỢ UDP ---
+# Nếu node proxy không relay được UDP, REJECT để traffic (gồm QUIC/HTTP3)
+# fallback về TCP/HTTP2 thay vì rò rỉ trực tiếp. An toàn cho đa số node.
+# Nếu node CỦA BẠN relay UDP tốt (muốn giữ QUIC), đổi REJECT thành DIRECT.
+udp-policy-not-supported-behaviour = REJECT
+
+# --- TỐI ƯU MẠNG NỘI BỘ (LAN bypass) ---
+# 17.0.0.0/8 = dải Apple (Push/iCloud); 100.64.0.0/10 = CGNAT.
+skip-proxy = %APPEND% 127.0.0.1, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 100.64.0.0/10, 17.0.0.0/8, localhost, *.local
+# Note: *.crashlytics.com removed — conflicts with REJECT-DROP rule in section 2.3
+
+# --- TUN EXCLUDED ROUTES: dải IP không đi qua TUN ---
+tun-excluded-routes = %APPEND% 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12
+
+# ------------------------------------------------------------
+# LƯU Ý TƯƠNG THÍCH SHADOWROCKET:
+# 2 khóa dưới đây là cú pháp của Surge/LanceX. Shadowrocket KHÔNG đọc
+# chúng (bị bỏ qua âm thầm, không gây lỗi). Giữ lại để file dùng chung
+# được với Surge. Trên Shadowrocket, việc ép YouTube bỏ HTTP/3 (QUIC)
+# đã được xử lý bằng rule "BLOCK QUIC FOR YOUTUBE MITM" ở mục [Rule].
+# ------------------------------------------------------------
+# (Surge-only) force-http-engine-hosts = %APPEND% *youtube.com:443, *googlevideo.com:443, api.revenuecat.com:443, api.rc-backup.com:443
+# (Surge-only) always-real-ip = %APPEND% *.lan, *.local, *.msftconnecttest.com, *.msftncsi.com, detectportal.firefox.com, captive.apple.com, *.srv.nintendo.net, *.stun.playstation.net, xbox.*.microsoft.com, *.xboxlive.com
+
+[Rule]
+# === BLOCK QUIC FOR YOUTUBE MITM ===
+AND,((DOMAIN-SUFFIX,googlevideo.com), (PROTOCOL,UDP)),REJECT
+AND,((DOMAIN,youtubei.googleapis.com), (PROTOCOL,UDP)),REJECT
+
+# === BLOCK WEBRTC LEAK (Specific servers) ===
+# Note: Generic KEYWORD stun/turn removed — breaks VoIP (FaceTime, WhatsApp, Zoom)
+DOMAIN-SUFFIX,stun.l.google.com,REJECT
+DOMAIN-SUFFIX,stun1.l.google.com,REJECT
+DOMAIN-SUFFIX,stun2.l.google.com,REJECT
+DOMAIN-SUFFIX,stun3.l.google.com,REJECT
+DOMAIN-SUFFIX,stun4.l.google.com,REJECT
+
+# === SPOTIFY ADS ===
+DOMAIN-SUFFIX,audio-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,audio4-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,heads-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,heads4-ak-spotify-com.akamaized.net,REJECT
+DOMAIN,spclient.wg.spotify.com,DIRECT
+DOMAIN-KEYWORD,spotify-ads,REJECT
+DOMAIN-SUFFIX,ads-fa.spotify.com,REJECT
+DOMAIN-SUFFIX,analytics.spotify.com,REJECT
+DOMAIN-SUFFIX,adeventtracker.spotify.com,REJECT
+DOMAIN-SUFFIX,log.spotify.com,REJECT
+DOMAIN-SUFFIX,creativeservice-production.scdn.co,REJECT
+
+# ===========================================================
+# === CHẶN QUẢNG CÁO + CỜ BẠC/CÁ ĐỘ TỔNG HỢP (Ad Block) ===
+# === by z3rokaze - 2026-05-27 (Ultimate Edition)            ===
+# ===========================================================
+
+# ┌─────────────────────────────────────┐
+# │  PHẦN 1: CHẶN QUẢNG CÁO (AD BLOCK) │
+# └─────────────────────────────────────┘
+
+# --- 1.1 Google Ads / AdMob / DoubleClick ---
+DOMAIN-SUFFIX,adservice.google.com,REJECT
+DOMAIN-SUFFIX,adservice.google.com.vn,REJECT
+DOMAIN-SUFFIX,admob.com,REJECT
+DOMAIN-SUFFIX,app-measurement.com,REJECT
+DOMAIN-SUFFIX,googleadservices.com,REJECT
+DOMAIN-SUFFIX,googlesyndication.com,REJECT
+DOMAIN-SUFFIX,doubleclick.net,REJECT
+DOMAIN-SUFFIX,ads.google.com,REJECT
+DOMAIN-SUFFIX,pagead-googlehosted.l.google.com,REJECT
+DOMAIN-SUFFIX,googletagmanager.com,REJECT
+DOMAIN-KEYWORD,googleads,REJECT
+DOMAIN-KEYWORD,google-analytics,REJECT
+
+# --- 1.2 Facebook / Meta Ads ---
+DOMAIN-SUFFIX,an.facebook.com,REJECT
+DOMAIN-SUFFIX,ads.facebook.com,REJECT
+DOMAIN-SUFFIX,adtago.s3.amazonaws.com,REJECT
+DOMAIN-SUFFIX,pixel.facebook.com,REJECT
+
+# --- 1.3 Unity Ads ---
+DOMAIN-SUFFIX,unityads.unity3d.com,REJECT
+DOMAIN-SUFFIX,ads.unity3d.com,REJECT
+DOMAIN-KEYWORD,unityads,REJECT
+
+# --- 1.4 AppLovin / MAX ---
+DOMAIN-SUFFIX,applovin.com,REJECT
+DOMAIN-SUFFIX,applvn.com,REJECT
+DOMAIN-KEYWORD,applovin,REJECT
+
+# --- 1.5 IronSource / LevelPlay ---
+DOMAIN-SUFFIX,ironsrc.com,REJECT
+DOMAIN-SUFFIX,supersonicads.com,REJECT
+DOMAIN-KEYWORD,ironsource,REJECT
+
+# --- 1.6 Vungle / Liftoff ---
+DOMAIN-SUFFIX,vungle.com,REJECT
+DOMAIN-SUFFIX,liftoff.io,REJECT
+DOMAIN-KEYWORD,vungle,REJECT
+
+# --- 1.7 Chartboost ---
+DOMAIN-SUFFIX,chartboost.com,REJECT
+DOMAIN-KEYWORD,chartboost,REJECT
+
+# --- 1.8 InMobi ---
+DOMAIN-SUFFIX,inmobi.com,REJECT
+DOMAIN-KEYWORD,inmobi,REJECT
+
+# --- 1.9 Mintegral / Mobvista ---
+DOMAIN-SUFFIX,mintegral.com,REJECT
+DOMAIN-SUFFIX,rayjump.com,REJECT
+DOMAIN-SUFFIX,mobvista.com,REJECT
+DOMAIN-KEYWORD,mintegral,REJECT
+
+# --- 1.10 AdColony / Digital Turbine ---
+DOMAIN-SUFFIX,adcolony.com,REJECT
+DOMAIN-SUFFIX,digitalturbine.com,REJECT
+DOMAIN-KEYWORD,adcolony,REJECT
+
+# --- 1.11 MoPub (Twitter) ---
+DOMAIN-SUFFIX,mopub.com,REJECT
+DOMAIN-KEYWORD,mopub,REJECT
+
+# --- 1.12 Fyber / Digital Turbine ---
+DOMAIN-SUFFIX,fyber.com,REJECT
+DOMAIN-SUFFIX,inner-active.mobi,REJECT
+
+# --- 1.13 Smaato ---
+DOMAIN-SUFFIX,smaato.com,REJECT
+DOMAIN-SUFFIX,smaato.net,REJECT
+
+# --- 1.14 Tapjoy ---
+DOMAIN-SUFFIX,tapjoy.com,REJECT
+DOMAIN-KEYWORD,tapjoy,REJECT
+
+# --- 1.15 Pangle (TikTok Ads / ByteDance) ---
+DOMAIN-SUFFIX,pangleglobal.com,REJECT
+DOMAIN-SUFFIX,pglstatp-toutiao.com,REJECT
+# DOMAIN-SUFFIX,byteimg.com,REJECT # Disabled: blocks TikTok images/videos
+DOMAIN-KEYWORD,pangleglobal,REJECT
+
+# --- 1.16 Amazon Ads ---
+DOMAIN-SUFFIX,amazon-adsystem.com,REJECT
+DOMAIN-SUFFIX,aan.amazon.com,REJECT
+
+# --- 1.17 StartApp / Start.io ---
+DOMAIN-SUFFIX,startapp.com,REJECT
+DOMAIN-SUFFIX,start.io,REJECT
+DOMAIN-KEYWORD,startapp,REJECT
+
+# --- 1.18 Ogury ---
+DOMAIN-SUFFIX,ogury.com,REJECT
+
+# --- 1.19 Yahoo / Flurry ---
+DOMAIN-SUFFIX,flurry.com,REJECT
+DOMAIN-SUFFIX,ads.yahoo.com,REJECT
+DOMAIN-SUFFIX,analytics.yahoo.com,REJECT
+
+# --- 1.20 Criteo ---
+DOMAIN-SUFFIX,criteo.com,REJECT
+DOMAIN-SUFFIX,criteo.net,REJECT
+DOMAIN-SUFFIX,emailretargeting.com,REJECT
+
+# --- 1.21 Teads (Video Ads) ---
+DOMAIN-SUFFIX,teads.tv,REJECT
+DOMAIN-SUFFIX,teads.com,REJECT
+
+# --- 1.22 PubMatic ---
+DOMAIN-SUFFIX,pubmatic.com,REJECT
+
+# --- 1.23 OpenX ---
+DOMAIN-SUFFIX,openx.net,REJECT
+DOMAIN-SUFFIX,openx.com,REJECT
+
+# --- 1.24 Index Exchange ---
+DOMAIN-SUFFIX,casalemedia.com,REJECT
+
+# --- 1.25 SmartAdServer ---
+DOMAIN-SUFFIX,smartadserver.com,REJECT
+DOMAIN-SUFFIX,sascdn.com,REJECT
+
+# --- 1.26 AdRoll ---
+DOMAIN-SUFFIX,adroll.com,REJECT
+
+# --- 1.27 Media.net ---
+DOMAIN-SUFFIX,media.net,REJECT
+
+# --- 1.28 RevContent / MGID / Content Ads ---
+DOMAIN-SUFFIX,revcontent.com,REJECT
+DOMAIN-SUFFIX,mgid.com,REJECT
+DOMAIN-SUFFIX,contentad.net,REJECT
+
+# --- 1.29 ShareThrough / TripleLift / Nativo ---
+DOMAIN-SUFFIX,sharethrough.com,REJECT
+DOMAIN-SUFFIX,triplelift.com,REJECT
+DOMAIN-SUFFIX,nativo.com,REJECT
+
+# --- 1.30 Yandex Ads ---
+DOMAIN-SUFFIX,an.yandex.ru,REJECT
+DOMAIN-SUFFIX,yandexadexchange.net,REJECT
+
+# --- 1.31 Baidu / Tencent Ads ---
+DOMAIN-SUFFIX,pos.baidu.com,REJECT
+DOMAIN-SUFFIX,cpro.baidu.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+
+# --- 1.32 Ad Verification / Viewability ---
+DOMAIN-SUFFIX,moat.com,REJECT
+DOMAIN-SUFFIX,moatads.com,REJECT
+DOMAIN-SUFFIX,doubleverify.com,REJECT
+DOMAIN-SUFFIX,integralads.com,REJECT
+DOMAIN-SUFFIX,adsafeprotected.com,REJECT
+
+# --- 1.33 TikTok Ads ---
+DOMAIN-SUFFIX,ads.tiktok.com,REJECT
+DOMAIN-SUFFIX,analytics.tiktok.com,REJECT
+DOMAIN-SUFFIX,ct.tiktok.com,REJECT
+# DOMAIN-KEYWORD,bytedance,REJECT  # Disabled: too broad, blocks CapCut, TikTok, Lark
+
+# --- 1.34 Additional Ad Networks ---
+DOMAIN-SUFFIX,adform.net,REJECT
+DOMAIN-SUFFIX,adnxs.com,REJECT
+DOMAIN-SUFFIX,adzerk.net,REJECT
+DOMAIN-SUFFIX,adtech.com,REJECT
+DOMAIN-SUFFIX,adition.com,REJECT
+DOMAIN-SUFFIX,adzerk.com,REJECT
+
+# --- 1.35 New Ad Networks (2025-2026) ---
+DOMAIN-SUFFIX,verve.com,REJECT
+DOMAIN-SUFFIX,pubnative.net,REJECT
+DOMAIN-SUFFIX,appmetrica.yandex.com,REJECT
+DOMAIN-SUFFIX,report.appmetrica.yandex.net,REJECT
+DOMAIN-SUFFIX,moloco.com,REJECT
+DOMAIN-KEYWORD,moloco,REJECT
+DOMAIN-SUFFIX,bigoads.com,REJECT
+DOMAIN-SUFFIX,ad.xiaomi.com,REJECT
+
+# --- 1.36 Ad/Attribution Networks bổ sung (2026) ---
+DOMAIN-SUFFIX,bidmachine.io,REJECT
+DOMAIN-SUFFIX,bidease.com,REJECT
+DOMAIN-SUFFIX,prebid.org,REJECT
+DOMAIN-SUFFIX,prebid.com,REJECT
+DOMAIN-SUFFIX,gumgum.com,REJECT
+DOMAIN-SUFFIX,smartyads.com,REJECT
+DOMAIN-SUFFIX,loopme.com,REJECT
+DOMAIN-SUFFIX,kidoz.net,REJECT
+DOMAIN-SUFFIX,yieldmo.com,REJECT
+DOMAIN-SUFFIX,zeotap.com,REJECT
+DOMAIN-SUFFIX,id5-sync.com,REJECT
+DOMAIN-SUFFIX,adsmoloco.com,REJECT
+DOMAIN-SUFFIX,a-mo.net,REJECT
+DOMAIN-SUFFIX,adtarget.com.tr,REJECT
+DOMAIN-SUFFIX,vidoomy.com,REJECT
+
+# ┌──────────────────────────────────────┐
+# │  PHẦN 2: TRACKING & ANALYTICS SDKs  │
+# └──────────────────────────────────────┘
+
+# --- 2.1 Attribution / Mobile Measurement ---
+DOMAIN-SUFFIX,adjust.com,REJECT-DROP
+DOMAIN-SUFFIX,adjust.io,REJECT-DROP
+DOMAIN-SUFFIX,appsflyer.com,REJECT-DROP
+DOMAIN-SUFFIX,kochava.com,REJECT-DROP
+DOMAIN-SUFFIX,singular.net,REJECT-DROP
+DOMAIN-SUFFIX,tenjin.com,REJECT-DROP
+DOMAIN-SUFFIX,airbridge.io,REJECT-DROP
+
+# --- 2.2 Analytics Platforms ---
+DOMAIN-SUFFIX,mixpanel.com,REJECT-DROP
+DOMAIN-SUFFIX,amplitude.com,REJECT-DROP
+DOMAIN-SUFFIX,segment.io,REJECT-DROP
+DOMAIN-SUFFIX,segment.com,REJECT-DROP
+DOMAIN-SUFFIX,heapanalytics.com,REJECT-DROP
+DOMAIN-SUFFIX,fullstory.com,REJECT-DROP
+DOMAIN-SUFFIX,hotjar.com,REJECT-DROP
+DOMAIN-SUFFIX,mouseflow.com,REJECT-DROP
+DOMAIN-SUFFIX,crazyegg.com,REJECT-DROP
+DOMAIN-SUFFIX,kissmetrics.com,REJECT-DROP
+
+# --- 2.3 General Web Tracking ---
+DOMAIN-SUFFIX,scorecardresearch.com,REJECT-DROP
+DOMAIN-SUFFIX,omtrdc.net,REJECT-DROP
+DOMAIN-SUFFIX,demdex.net,REJECT-DROP
+DOMAIN-SUFFIX,adsrvr.org,REJECT-DROP
+# DOMAIN-SUFFIX,firebase.com,REJECT  # Disabled: breaks push notifications & auth
+DOMAIN-SUFFIX,crashlytics.com,REJECT-DROP
+DOMAIN-SUFFIX,braze.com,REJECT-DROP
+DOMAIN-SUFFIX,clevertap.com,REJECT-DROP
+DOMAIN-SUFFIX,intercom.io,REJECT-DROP
+DOMAIN-SUFFIX,intercom.com,REJECT-DROP
+DOMAIN-SUFFIX,mookie1.com,REJECT-DROP
+DOMAIN-SUFFIX,taboola.com,REJECT-DROP
+DOMAIN-SUFFIX,outbrain.com,REJECT-DROP
+DOMAIN-SUFFIX,bluekai.com,REJECT-DROP
+DOMAIN-SUFFIX,everesttech.net,REJECT-DROP
+DOMAIN-SUFFIX,mathtag.com,REJECT-DROP
+DOMAIN-SUFFIX,bidswitch.net,REJECT-DROP
+DOMAIN-SUFFIX,exelator.com,REJECT-DROP
+DOMAIN-SUFFIX,crwdcntrl.net,REJECT-DROP
+DOMAIN-SUFFIX,dotomi.com,REJECT-DROP
+DOMAIN-SUFFIX,serving-sys.com,REJECT-DROP
+DOMAIN-SUFFIX,eyeota.net,REJECT-DROP
+DOMAIN-SUFFIX,agkn.com,REJECT-DROP
+DOMAIN-SUFFIX,rlcdn.com,REJECT-DROP
+DOMAIN-SUFFIX,turn.com,REJECT-DROP
+DOMAIN-SUFFIX,rubiconproject.com,REJECT-DROP
+DOMAIN-SUFFIX,contextweb.com,REJECT-DROP
+DOMAIN-SUFFIX,spotxchange.com,REJECT-DROP
+
+# --- 2.4 Tracking / Analytics bổ sung (2026) ---
+DOMAIN-SUFFIX,sentry.io,REJECT-DROP
+DOMAIN-SUFFIX,bugsnag.com,REJECT-DROP
+DOMAIN-SUFFIX,instabug.com,REJECT-DROP
+DOMAIN-SUFFIX,embrace.io,REJECT-DROP
+DOMAIN-SUFFIX,datadoghq.com,REJECT-DROP
+DOMAIN-SUFFIX,nr-data.net,REJECT-DROP
+DOMAIN-SUFFIX,newrelic.com,REJECT-DROP
+# DOMAIN-SUFFIX,statsig.com,REJECT-DROP      # Disabled: feature-flag, vài app phụ thuộc để bật tính năng
+DOMAIN-SUFFIX,posthog.com,REJECT-DROP
+DOMAIN-SUFFIX,rudderstack.com,REJECT-DROP
+DOMAIN-SUFFIX,smartlook.com,REJECT-DROP
+DOMAIN-SUFFIX,quantcast.com,REJECT-DROP
+DOMAIN-SUFFIX,permutive.com,REJECT-DROP
+# DOMAIN-SUFFIX,cookielaw.org,REJECT-DROP    # Disabled: có thể treo banner xin cookie trên 1 số web
+# DOMAIN-SUFFIX,launchdarkly.com,REJECT-DROP # Disabled: feature-flag, vài app phụ thuộc để bật tính năng
+
+# ┌─────────────────────────────────────┐
+# │  PHẦN 3: QUẢNG CÁO VIỆT NAM        │
+# └─────────────────────────────────────┘
+
+DOMAIN-SUFFIX,adservice.zaloapp.com,REJECT
+# DOMAIN-KEYWORD,zaloapp.com/ads,REJECT  # Disabled: DOMAIN-KEYWORD cannot match URL path
+DOMAIN-SUFFIX,admicro.vn,REJECT
+DOMAIN-SUFFIX,adsplay.net,REJECT
+DOMAIN-SUFFIX,adtima.vn,REJECT
+DOMAIN-SUFFIX,eclick.vn,REJECT
+DOMAIN-SUFFIX,novaon.vn,REJECT
+DOMAIN-SUFFIX,nativex.vn,REJECT
+DOMAIN-SUFFIX,adpia.vn,REJECT
+DOMAIN-SUFFIX,ants.vn,REJECT
+DOMAIN-SUFFIX,accesstrade.vn,REJECT
+DOMAIN-SUFFIX,younetmedia.com,REJECT
+
+# --- 3.1 Quảng cáo / Tracking Việt Nam bổ sung (2026) ---
+DOMAIN-SUFFIX,vcmedia.vn,REJECT
+DOMAIN-SUFFIX,goada.vn,REJECT
+DOMAIN-SUFFIX,adnetwork.vn,REJECT
+DOMAIN-SUFFIX,mcads.vn,REJECT
+DOMAIN-SUFFIX,blueseed.tv,REJECT
+
+# ┌─────────────────────────────────────┐
+# │  PHẦN 4: POPUP / REDIRECT / SCAM    │
+# └─────────────────────────────────────┘
+
+DOMAIN-SUFFIX,popads.net,REJECT
+DOMAIN-SUFFIX,popcash.net,REJECT
+DOMAIN-SUFFIX,propellerads.com,REJECT
+DOMAIN-SUFFIX,propellerclick.com,REJECT
+DOMAIN-SUFFIX,trafficjunky.com,REJECT
+DOMAIN-SUFFIX,revenuehits.com,REJECT
+DOMAIN-SUFFIX,exoclick.com,REJECT
+DOMAIN-SUFFIX,clickadu.com,REJECT
+DOMAIN-SUFFIX,hilltopads.com,REJECT
+DOMAIN-SUFFIX,richpush.com,REJECT
+DOMAIN-SUFFIX,pushengage.com,REJECT
+DOMAIN-SUFFIX,adsterra.com,REJECT
+DOMAIN-SUFFIX,adsterratools.com,REJECT
+DOMAIN-SUFFIX,trafficstars.com,REJECT
+DOMAIN-SUFFIX,juicyads.com,REJECT
+DOMAIN-SUFFIX,trafficfactory.biz,REJECT
+DOMAIN-SUFFIX,clickaine.com,REJECT
+DOMAIN-SUFFIX,evadav.com,REJECT
+DOMAIN-SUFFIX,galaksion.com,REJECT
+DOMAIN-SUFFIX,onclickmx.com,REJECT
+
+# --- 4.1 Popup / Push / Malvertising bổ sung (2026) ---
+DOMAIN-SUFFIX,adcash.com,REJECT
+DOMAIN-SUFFIX,mgcash.com,REJECT
+DOMAIN-SUFFIX,popunder.net,REJECT
+DOMAIN-SUFFIX,admaven.com,REJECT
+DOMAIN-SUFFIX,ad-maven.com,REJECT
+DOMAIN-SUFFIX,pushwhy.com,REJECT
+DOMAIN-SUFFIX,push-house.com,REJECT
+DOMAIN-SUFFIX,partner.pushhouse.com,REJECT
+DOMAIN-SUFFIX,datsprings.com,REJECT
+DOMAIN-SUFFIX,zeydoo.com,REJECT
+DOMAIN-SUFFIX,propu.sh,REJECT
+DOMAIN-SUFFIX,vignatti.com,REJECT
+DOMAIN-SUFFIX,mybetterdl.com,REJECT
+DOMAIN-SUFFIX,clickfuse.com,REJECT
+
+# ┌──────────────────────────────────────────────────────────┐
+# │  PHẦN 5: CHẶN WEB CÁ ĐỘ / CỜ BẠC / CASINO (GAMBLING)  │
+# └──────────────────────────────────────────────────────────┘
+
+# --- 5.1 Cá độ / Cờ bạc phổ biến tại Việt Nam ---
+DOMAIN-SUFFIX,1xbet.com,REJECT
+DOMAIN-SUFFIX,1xbet.vn,REJECT
+DOMAIN-SUFFIX,fun88.com,REJECT
+DOMAIN-SUFFIX,fun88asia.com,REJECT
+DOMAIN-SUFFIX,fun88vietnam.com,REJECT
+DOMAIN-SUFFIX,w88.com,REJECT
+DOMAIN-SUFFIX,w88vn.com,REJECT
+DOMAIN-SUFFIX,w88top.com,REJECT
+DOMAIN-SUFFIX,188bet.com,REJECT
+DOMAIN-SUFFIX,188betasia.com,REJECT
+DOMAIN-SUFFIX,m88.com,REJECT
+DOMAIN-SUFFIX,m88a.com,REJECT
+DOMAIN-SUFFIX,m88vn.com,REJECT
+DOMAIN-SUFFIX,bk8.com,REJECT
+DOMAIN-SUFFIX,bk8vn.com,REJECT
+DOMAIN-SUFFIX,fb88.com,REJECT
+DOMAIN-SUFFIX,fb88vn.com,REJECT
+DOMAIN-SUFFIX,sv388.com,REJECT
+DOMAIN-SUFFIX,sv388vn.com,REJECT
+DOMAIN-SUFFIX,sin88.com,REJECT
+DOMAIN-SUFFIX,sin88.club,REJECT
+DOMAIN-SUFFIX,hi88.com,REJECT
+DOMAIN-SUFFIX,hi88.bio,REJECT
+DOMAIN-SUFFIX,hi88.club,REJECT
+DOMAIN-SUFFIX,new88.com,REJECT
+DOMAIN-SUFFIX,new88.club,REJECT
+DOMAIN-SUFFIX,new88vn.com,REJECT
+DOMAIN-SUFFIX,8xbet.com,REJECT
+DOMAIN-SUFFIX,8xbet.gg,REJECT
+DOMAIN-SUFFIX,jun88.com,REJECT
+DOMAIN-SUFFIX,jun88.bio,REJECT
+DOMAIN-SUFFIX,jun88.club,REJECT
+DOMAIN-SUFFIX,vn88.com,REJECT
+DOMAIN-SUFFIX,vn88.club,REJECT
+DOMAIN-SUFFIX,789bet.com,REJECT
+DOMAIN-SUFFIX,789bet.gg,REJECT
+DOMAIN-SUFFIX,789bet.club,REJECT
+DOMAIN-SUFFIX,kubet.com,REJECT
+DOMAIN-SUFFIX,kubet.io,REJECT
+DOMAIN-SUFFIX,kubet.club,REJECT
+DOMAIN-SUFFIX,sobet.io,REJECT
+DOMAIN-SUFFIX,sunwin.com,REJECT
+DOMAIN-SUFFIX,sunwin.club,REJECT
+DOMAIN-SUFFIX,sunwin.gg,REJECT
+DOMAIN-SUFFIX,iwin.com,REJECT
+DOMAIN-SUFFIX,iwin.club,REJECT
+DOMAIN-SUFFIX,iwin68.club,REJECT
+DOMAIN-SUFFIX,go88.com,REJECT
+DOMAIN-SUFFIX,go88.club,REJECT
+DOMAIN-SUFFIX,go88.gg,REJECT
+DOMAIN-SUFFIX,rikvip.com,REJECT
+DOMAIN-SUFFIX,rikvip.club,REJECT
+DOMAIN-SUFFIX,rik.vip,REJECT
+DOMAIN-SUFFIX,8day.com,REJECT
+DOMAIN-SUFFIX,8day.club,REJECT
+DOMAIN-SUFFIX,ta88.com,REJECT
+DOMAIN-SUFFIX,ta88.club,REJECT
+DOMAIN-SUFFIX,tf88.com,REJECT
+DOMAIN-SUFFIX,shbet.com,REJECT
+DOMAIN-SUFFIX,shbet.club,REJECT
+DOMAIN-SUFFIX,luck8.com,REJECT
+DOMAIN-SUFFIX,luck8.club,REJECT
+DOMAIN-SUFFIX,mb66.com,REJECT
+DOMAIN-SUFFIX,mb66.club,REJECT
+DOMAIN-SUFFIX,five88.com,REJECT
+DOMAIN-SUFFIX,five88.gg,REJECT
+DOMAIN-SUFFIX,zbet.com,REJECT
+DOMAIN-SUFFIX,zbet.club,REJECT
+DOMAIN-SUFFIX,oxbet.com,REJECT
+DOMAIN-SUFFIX,oxbet.club,REJECT
+DOMAIN-SUFFIX,ae888.com,REJECT
+DOMAIN-SUFFIX,ae888.club,REJECT
+DOMAIN-SUFFIX,taya365.com,REJECT
+DOMAIN-SUFFIX,taya365.club,REJECT
+DOMAIN-SUFFIX,66bet.com,REJECT
+DOMAIN-SUFFIX,77bet.com,REJECT
+DOMAIN-SUFFIX,33win.com,REJECT
+DOMAIN-SUFFIX,33win.club,REJECT
+DOMAIN-SUFFIX,f8bet.com,REJECT
+DOMAIN-SUFFIX,f8bet.club,REJECT
+DOMAIN-SUFFIX,bet88.com,REJECT
+DOMAIN-SUFFIX,bet88.club,REJECT
+DOMAIN-SUFFIX,qh88.com,REJECT
+DOMAIN-SUFFIX,qh88.club,REJECT
+DOMAIN-SUFFIX,78win.com,REJECT
+DOMAIN-SUFFIX,78win.club,REJECT
+DOMAIN-SUFFIX,abc8.com,REJECT
+DOMAIN-SUFFIX,abc8.club,REJECT
+DOMAIN-SUFFIX,debet.com,REJECT
+DOMAIN-SUFFIX,debet.club,REJECT
+DOMAIN-SUFFIX,mu88.com,REJECT
+DOMAIN-SUFFIX,mu88.club,REJECT
+DOMAIN-SUFFIX,gg8.com,REJECT
+DOMAIN-SUFFIX,gg8.club,REJECT
+DOMAIN-SUFFIX,b52.com,REJECT
+DOMAIN-SUFFIX,b52.club,REJECT
+DOMAIN-SUFFIX,uy88.com,REJECT
+DOMAIN-SUFFIX,top88.com,REJECT
+DOMAIN-SUFFIX,top88.club,REJECT
+DOMAIN-SUFFIX,betvisa.com,REJECT
+DOMAIN-SUFFIX,betvisa.vn,REJECT
+DOMAIN-SUFFIX,bong88.com,REJECT
+DOMAIN-SUFFIX,bong88.net,REJECT
+
+# --- 5.2 Trang cá độ quốc tế ---
+DOMAIN-SUFFIX,bet365.com,REJECT
+DOMAIN-SUFFIX,22bet.com,REJECT
+DOMAIN-SUFFIX,mostbet.com,REJECT
+DOMAIN-SUFFIX,melbet.com,REJECT
+DOMAIN-SUFFIX,stake.com,REJECT
+DOMAIN-SUFFIX,1win.com,REJECT
+DOMAIN-SUFFIX,betwinner.com,REJECT
+DOMAIN-SUFFIX,parimatch.com,REJECT
+DOMAIN-SUFFIX,pin-up.com,REJECT
+DOMAIN-SUFFIX,linebet.com,REJECT
+DOMAIN-SUFFIX,megapari.com,REJECT
+DOMAIN-SUFFIX,betway.com,REJECT
+DOMAIN-SUFFIX,dafabet.com,REJECT
+DOMAIN-SUFFIX,sbobet.com,REJECT
+DOMAIN-SUFFIX,12bet.com,REJECT
+DOMAIN-SUFFIX,10bet.com,REJECT
+DOMAIN-SUFFIX,betfair.com,REJECT
+DOMAIN-SUFFIX,888casino.com,REJECT
+DOMAIN-SUFFIX,unibet.com,REJECT
+DOMAIN-SUFFIX,leovegas.com,REJECT
+DOMAIN-SUFFIX,vulkanvegas.com,REJECT
+DOMAIN-SUFFIX,vulkanbet.com,REJECT
+DOMAIN-SUFFIX,bcgame.com,REJECT
+
+# --- 5.2b Trang cá độ mới (2025-2026) ---
+DOMAIN-SUFFIX,ok9.com,REJECT
+DOMAIN-SUFFIX,ok9.club,REJECT
+DOMAIN-SUFFIX,v9bet.com,REJECT
+DOMAIN-SUFFIX,nohu.club,REJECT
+DOMAIN-SUFFIX,nohu90.com,REJECT
+DOMAIN-SUFFIX,hitclub.com,REJECT
+DOMAIN-SUFFIX,hitclub.gg,REJECT
+DOMAIN-SUFFIX,57k.com,REJECT
+# DOMAIN-KEYWORD,ok9,REJECT     # Disabled: too short, may match book9.com etc.
+# DOMAIN-KEYWORD,hitclub,REJECT  # Disabled: may match legitimate domains
+
+# --- 5.2c Trang cá độ / nổ hũ mới (2026) ---
+DOMAIN-SUFFIX,79king.com,REJECT
+DOMAIN-SUFFIX,79king.club,REJECT
+DOMAIN-SUFFIX,win79.club,REJECT
+DOMAIN-SUFFIX,may88.com,REJECT
+DOMAIN-SUFFIX,sao88.com,REJECT
+DOMAIN-SUFFIX,typhu88.com,REJECT
+DOMAIN-SUFFIX,vz99.com,REJECT
+DOMAIN-SUFFIX,dabet.com,REJECT
+DOMAIN-SUFFIX,dabet.club,REJECT
+DOMAIN-SUFFIX,sumvip.com,REJECT
+DOMAIN-SUFFIX,sumvip.club,REJECT
+DOMAIN-SUFFIX,888b.com,REJECT
+DOMAIN-SUFFIX,888b.club,REJECT
+DOMAIN-SUFFIX,j88.com,REJECT
+DOMAIN-SUFFIX,j88.club,REJECT
+DOMAIN-SUFFIX,vip66.club,REJECT
+DOMAIN-SUFFIX,68gamebai.com,REJECT
+DOMAIN-SUFFIX,king88.com,REJECT
+DOMAIN-SUFFIX,sky88.com,REJECT
+DOMAIN-SUFFIX,77win.com,REJECT
+DOMAIN-SUFFIX,77win.club,REJECT
+DOMAIN-SUFFIX,99ok.com,REJECT
+DOMAIN-SUFFIX,good88.com,REJECT
+
+# --- 5.3 Keyword chặn cá độ phổ biến ---
+DOMAIN-KEYWORD,1xbet,REJECT
+DOMAIN-KEYWORD,fun88,REJECT
+DOMAIN-KEYWORD,w88vn,REJECT
+DOMAIN-KEYWORD,8xbet,REJECT
+DOMAIN-KEYWORD,jun88,REJECT
+DOMAIN-KEYWORD,789bet,REJECT
+DOMAIN-KEYWORD,kubet,REJECT
+# DOMAIN-KEYWORD,sunwin,REJECT  # Disabled: may match sunwindows.com etc.
+# DOMAIN-KEYWORD,go88,REJECT    # Disabled: may match cargo88.com, lego88.com etc.
+DOMAIN-KEYWORD,new88,REJECT
+# DOMAIN-KEYWORD,hi88,REJECT    # Disabled: may match sushi88.com, phi88.com etc.
+# DOMAIN-KEYWORD,sin88,REJECT   # Disabled: may match resin88.com etc.
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 6: AI SERVICES ROUTING (PROXY)                │
+# │  Nguồn: tatarinovms/ShadowRocketSimpleConfig         │
+# └──────────────────────────────────────────────────────┘
+
+# --- 6.1 OpenAI / ChatGPT ---
+DOMAIN-SUFFIX,openai.com,PROXY
+DOMAIN-SUFFIX,chatgpt.com,PROXY
+DOMAIN-SUFFIX,oaistatic.com,PROXY
+DOMAIN-SUFFIX,oaiusercontent.com,PROXY
+DOMAIN-SUFFIX,chat.openai.com.cdn.cloudflare.net,PROXY
+DOMAIN-KEYWORD,openai,PROXY
+
+# --- 6.2 Anthropic / Claude ---
+DOMAIN-SUFFIX,claude.ai,PROXY
+DOMAIN-SUFFIX,anthropic.com,PROXY
+
+# --- 6.3 Google AI ---
+DOMAIN-SUFFIX,gemini.google.com,PROXY
+DOMAIN-SUFFIX,bard.google.com,PROXY
+DOMAIN-SUFFIX,makersuite.google.com,PROXY
+DOMAIN-SUFFIX,generativelanguage.googleapis.com,PROXY
+DOMAIN-SUFFIX,aistudio.google.com,PROXY
+DOMAIN-SUFFIX,deepmind.google,PROXY
+
+# --- 6.4 Microsoft Copilot ---
+DOMAIN-SUFFIX,copilot.microsoft.com,PROXY
+DOMAIN-SUFFIX,sydney.bing.com,PROXY
+DOMAIN-SUFFIX,edgeservices.bing.com,PROXY
+
+# --- 6.5 Other AI Services ---
+DOMAIN-SUFFIX,midjourney.com,PROXY
+DOMAIN-SUFFIX,stability.ai,PROXY
+DOMAIN-SUFFIX,perplexity.ai,PROXY
+DOMAIN-SUFFIX,huggingface.co,PROXY
+DOMAIN-SUFFIX,poe.com,PROXY
+DOMAIN-SUFFIX,character.ai,PROXY
+DOMAIN-SUFFIX,replicate.com,PROXY
+DOMAIN-SUFFIX,runway.com,PROXY
+DOMAIN-SUFFIX,suno.ai,PROXY
+DOMAIN-SUFFIX,udio.com,PROXY
+DOMAIN-SUFFIX,cursor.sh,PROXY
+DOMAIN-SUFFIX,v0.dev,PROXY
+
+# --- 6.6 New AI Services (2025-2026) ---
+DOMAIN-SUFFIX,x.ai,PROXY
+DOMAIN-SUFFIX,deepseek.com,PROXY
+DOMAIN-SUFFIX,mistral.ai,PROXY
+DOMAIN-SUFFIX,cohere.com,PROXY
+DOMAIN-SUFFIX,together.ai,PROXY
+DOMAIN-SUFFIX,groq.com,PROXY
+DOMAIN-SUFFIX,bolt.new,PROXY
+DOMAIN-SUFFIX,replit.com,PROXY
+DOMAIN-SUFFIX,windsurf.com,PROXY
+DOMAIN-SUFFIX,codeium.com,PROXY
+DOMAIN-SUFFIX,lovable.dev,PROXY
+DOMAIN-SUFFIX,labs.google,PROXY
+DOMAIN-SUFFIX,notebooklm.google,PROXY
+DOMAIN-SUFFIX,notebooklm.google.com,PROXY
+
+# --- 6.7 AI Services bổ sung (2026) ---
+DOMAIN-SUFFIX,grok.com,PROXY
+DOMAIN-SUFFIX,qwen.ai,PROXY
+DOMAIN-SUFFIX,kimi.com,PROXY
+DOMAIN-SUFFIX,moonshot.cn,PROXY
+DOMAIN-SUFFIX,genspark.ai,PROXY
+DOMAIN-SUFFIX,manus.im,PROXY
+DOMAIN-SUFFIX,abacus.ai,PROXY
+DOMAIN-SUFFIX,fireworks.ai,PROXY
+DOMAIN-SUFFIX,openrouter.ai,PROXY
+DOMAIN-SUFFIX,elevenlabs.io,PROXY
+DOMAIN-SUFFIX,heygen.com,PROXY
+DOMAIN-SUFFIX,pika.art,PROXY
+DOMAIN-SUFFIX,krea.ai,PROXY
+DOMAIN-SUFFIX,ideogram.ai,PROXY
+DOMAIN-SUFFIX,leonardo.ai,PROXY
+DOMAIN-SUFFIX,civitai.com,PROXY
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 7: BỔ SUNG AD DOMAINS CÒN THIẾU              │
+# │  Nguồn: GMOogway + fmz200/wool_scripts               │
+# └──────────────────────────────────────────────────────┘
+
+# --- 7.1 Bổ sung Ad Networks ---
+DOMAIN-SUFFIX,ads-twitter.com,REJECT
+DOMAIN-SUFFIX,advertising.com,REJECT
+DOMAIN-SUFFIX,liadm.com,REJECT
+# DOMAIN-SUFFIX,branch.io,REJECT  # Disabled: breaks deep linking
+# DOMAIN-SUFFIX,app.link,REJECT   # Disabled: breaks deep linking
+DOMAIN-SUFFIX,go.link,REJECT
+DOMAIN-SUFFIX,onelink.me,REJECT
+# DOMAIN-SUFFIX,app.adjust.com,REJECT  # Redundant: covered by adjust.com in section 2.1
+# DOMAIN-SUFFIX,s.adjust.com,REJECT    # Redundant: covered by adjust.com in section 2.1
+DOMAIN-SUFFIX,impression.link,REJECT
+DOMAIN-SUFFIX,metric.gstatic.com,REJECT
+# DOMAIN-SUFFIX,pagead.l.doubleclick.net,REJECT  # Redundant: covered by doubleclick.net in section 1.1
+# DOMAIN-SUFFIX,adx.g.doubleclick.net,REJECT     # Redundant: covered by doubleclick.net in section 1.1
+
+# --- 7.2 Quảng cáo ứng dụng Trung Quốc ---
+DOMAIN-SUFFIX,cm.bilibili.com,REJECT
+DOMAIN-SUFFIX,data.bilibili.com,REJECT
+DOMAIN-SUFFIX,zhihu-web-analytics.zhihu.com,REJECT
+DOMAIN-SUFFIX,sugar.zhihu.com,REJECT
+DOMAIN-SUFFIX,118.etao.com,REJECT
+DOMAIN-SUFFIX,adash.m.taobao.com,REJECT
+DOMAIN-SUFFIX,sclick.net,REJECT
+DOMAIN-SUFFIX,re.taobao.com,REJECT
+DOMAIN-SUFFIX,sdk.m.amap.com,REJECT
+DOMAIN-SUFFIX,acs.m.taobao.com,REJECT
+
+# --- 7.3 Phishing / Malware / Crypto Scam ---
+# DOMAIN-KEYWORD,phishing,REJECT  # Disabled: too broad, blocks anti-phishing education sites
+# DOMAIN-KEYWORD,malware,REJECT   # Disabled: too broad, blocks anti-malware.org etc.
+DOMAIN-SUFFIX,coinhive.com,REJECT
+DOMAIN-SUFFIX,coin-hive.com,REJECT
+DOMAIN-SUFFIX,authedmine.com,REJECT
+DOMAIN-SUFFIX,cryptoloot.pro,REJECT
+DOMAIN-SUFFIX,crypto-loot.com,REJECT
+
+# --- 7.4 Crypto-miner / Drainer / Scam bổ sung (2026) ---
+DOMAIN-SUFFIX,coinimp.com,REJECT
+DOMAIN-SUFFIX,webminepool.com,REJECT
+DOMAIN-SUFFIX,minero.cc,REJECT
+DOMAIN-SUFFIX,jsecoin.com,REJECT
+DOMAIN-SUFFIX,coinhive-manager.com,REJECT
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 8: CHẶN TELEMETRY & TRACKING HỆ THỐNG         │
+# │  Nguồn: Johnshall/p-w-p                              │
+# └──────────────────────────────────────────────────────┘
+
+# --- 8.1 Microsoft Telemetry ---
+DOMAIN-SUFFIX,data.microsoft.com,REJECT-DROP
+DOMAIN-SUFFIX,telemetry.microsoft.com,REJECT-DROP
+
+# --- 8.2 Apple Analytics ---
+DOMAIN-SUFFIX,metrics.icloud.com,REJECT-DROP
+DOMAIN-SUFFIX,metrics.mzstatic.com,REJECT-DROP
+DOMAIN-SUFFIX,supportmetrics.apple.com,REJECT-DROP
+DOMAIN-SUFFIX,books-analytics-events.apple.com,REJECT-DROP
+DOMAIN-SUFFIX,xp.apple.com,REJECT-DROP
+DOMAIN-SUFFIX,idiag.apple.com,REJECT-DROP
+DOMAIN-SUFFIX,iphonesubmissions.apple.com,REJECT-DROP
+DOMAIN-SUFFIX,radarsubmissions.apple.com,REJECT-DROP
+
+# --- 8.3 Xiaomi / Huawei / Samsung Tracking ---
+DOMAIN-SUFFIX,tracking.miui.com,REJECT-DROP
+DOMAIN-SUFFIX,data.mistat.xiaomi.com,REJECT-DROP
+DOMAIN-SUFFIX,tracking.rus.miui.com,REJECT-DROP
+DOMAIN-SUFFIX,logservice.hicloud.com,REJECT-DROP
+DOMAIN-SUFFIX,metrics.data.hicloud.com,REJECT-DROP
+DOMAIN-SUFFIX,samsungads.com,REJECT-DROP
+
+# --- 8.4 Telemetry hệ thống bổ sung (2026) ---
+DOMAIN-SUFFIX,vortex.data.microsoft.com,REJECT-DROP
+DOMAIN-SUFFIX,settings-win.data.microsoft.com,REJECT-DROP
+DOMAIN-SUFFIX,watson.telemetry.microsoft.com,REJECT-DROP
+DOMAIN-SUFFIX,samsung-com.112.2o7.net,REJECT-DROP
+DOMAIN-SUFFIX,nmetrics.samsung.com,REJECT-DROP
+DOMAIN-SUFFIX,log.tbsapp.qq.com,REJECT-DROP
+DOMAIN-SUFFIX,oimg.vivo.com.cn,REJECT-DROP
+DOMAIN-SUFFIX,adsdk.dplaceholder.oppomobile.com,REJECT-DROP
+DOMAIN-SUFFIX,bdapi.oppomobile.com,REJECT-DROP
+DOMAIN-SUFFIX,iadsdk.apple.com,REJECT-DROP
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 9: GAMING SERVICES ROUTING (PROXY)             │
+# │  Nguồn: tatarinovms/ShadowRocketSimpleConfig          │
+# └──────────────────────────────────────────────────────┘
+
+# --- 9.1 PlayStation Network ---
+DOMAIN-SUFFIX,playstation.com,PROXY
+DOMAIN-SUFFIX,playstation.net,PROXY
+DOMAIN-SUFFIX,sonyentertainmentnetwork.com,PROXY
+
+# --- 9.2 Xbox / Microsoft Gaming ---
+DOMAIN-SUFFIX,xbox.com,PROXY
+DOMAIN-SUFFIX,xboxlive.com,PROXY
+
+# --- 9.3 Steam ---
+DOMAIN-SUFFIX,steampowered.com,PROXY
+DOMAIN-SUFFIX,steamcommunity.com,PROXY
+DOMAIN-SUFFIX,steamstatic.com,PROXY
+
+# --- 9.4 Nintendo ---
+DOMAIN-SUFFIX,nintendo.com,PROXY
+DOMAIN-SUFFIX,nintendo.net,PROXY
+
+# --- 9.5 Epic Games ---
+DOMAIN-SUFFIX,epicgames.com,PROXY
+DOMAIN-SUFFIX,unrealengine.com,PROXY
+
+# --- 9.6 Riot Games (LOL, Valorant, TFT) ---
+DOMAIN-SUFFIX,riotgames.com,PROXY
+DOMAIN-SUFFIX,leagueoflegends.com,PROXY
+DOMAIN-SUFFIX,riotcdn.net,PROXY
+
+# --- 9.7 EA / Blizzard / Ubisoft ---
+DOMAIN-SUFFIX,ea.com,PROXY
+DOMAIN-SUFFIX,origin.com,PROXY
+DOMAIN-SUFFIX,blizzard.com,PROXY
+DOMAIN-SUFFIX,battle.net,PROXY
+DOMAIN-SUFFIX,ubisoft.com,PROXY
+DOMAIN-SUFFIX,ubi.com,PROXY
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 10: STREAMING SERVICES (PROXY - Geo-unlock)    │
+# └──────────────────────────────────────────────────────┘
+
+# --- 10.1 Netflix ---
+DOMAIN-SUFFIX,netflix.com,PROXY
+DOMAIN-SUFFIX,netflix.net,PROXY
+DOMAIN-SUFFIX,nflximg.net,PROXY
+DOMAIN-SUFFIX,nflximg.com,PROXY
+DOMAIN-SUFFIX,nflxvideo.net,PROXY
+DOMAIN-SUFFIX,nflxso.net,PROXY
+DOMAIN-SUFFIX,nflxext.com,PROXY
+
+# --- 10.2 Disney+ ---
+DOMAIN-SUFFIX,disneyplus.com,PROXY
+DOMAIN-SUFFIX,disney-plus.net,PROXY
+DOMAIN-SUFFIX,dssott.com,PROXY
+DOMAIN-SUFFIX,bamgrid.com,PROXY
+DOMAIN-SUFFIX,disney-portal.my.onetrust.com,PROXY
+
+# --- 10.3 Amazon Prime Video ---
+DOMAIN-SUFFIX,primevideo.com,PROXY
+DOMAIN-SUFFIX,amazonvideo.com,PROXY
+DOMAIN-SUFFIX,aiv-cdn.net,PROXY
+
+# --- 10.4 HBO / Max ---
+DOMAIN-SUFFIX,hbomax.com,PROXY
+DOMAIN-SUFFIX,max.com,PROXY
+DOMAIN-SUFFIX,hbo.com,PROXY
+
+# --- 10.5 Other Streaming ---
+DOMAIN-SUFFIX,hulu.com,PROXY
+DOMAIN-SUFFIX,hulustream.com,PROXY
+DOMAIN-SUFFIX,tv.apple.com,PROXY
+DOMAIN-SUFFIX,crunchyroll.com,PROXY
+DOMAIN-SUFFIX,vrv.co,PROXY
+DOMAIN-SUFFIX,dazn.com,PROXY
+DOMAIN-SUFFIX,bilibili.tv,PROXY
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 11: SOCIAL MEDIA ROUTING (PROXY)               │
+# └──────────────────────────────────────────────────────┘
+
+# --- 11.1 Telegram ---
+DOMAIN-SUFFIX,telegram.org,PROXY
+DOMAIN-SUFFIX,t.me,PROXY
+DOMAIN-SUFFIX,telegra.ph,PROXY
+DOMAIN-SUFFIX,telegram.me,PROXY
+IP-CIDR,91.108.0.0/16,PROXY,no-resolve
+IP-CIDR,149.154.160.0/20,PROXY,no-resolve
+
+# --- 11.2 Discord ---
+DOMAIN-SUFFIX,discord.com,PROXY
+DOMAIN-SUFFIX,discord.gg,PROXY
+DOMAIN-SUFFIX,discordapp.com,PROXY
+DOMAIN-SUFFIX,discordapp.net,PROXY
+DOMAIN-SUFFIX,discord.media,PROXY
+
+# --- 11.3 Reddit ---
+DOMAIN-SUFFIX,reddit.com,PROXY
+DOMAIN-SUFFIX,redd.it,PROXY
+DOMAIN-SUFFIX,redditmedia.com,PROXY
+DOMAIN-SUFFIX,redditstatic.com,PROXY
+
+# --- 11.4 Threads / WhatsApp Web ---
+DOMAIN-SUFFIX,threads.net,PROXY
+DOMAIN-SUFFIX,web.whatsapp.com,PROXY
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 12: DEVELOPER TOOLS (PROXY)                    │
+# └──────────────────────────────────────────────────────┘
+
+# --- 12.1 GitHub / GitLab ---
+DOMAIN-SUFFIX,github.com,PROXY
+DOMAIN-SUFFIX,github.io,PROXY
+DOMAIN-SUFFIX,githubusercontent.com,PROXY
+DOMAIN-SUFFIX,githubassets.com,PROXY
+DOMAIN-SUFFIX,gitlab.com,PROXY
+DOMAIN-SUFFIX,gitlab.io,PROXY
+
+# --- 12.2 Package Registries ---
+DOMAIN-SUFFIX,docker.io,PROXY
+DOMAIN-SUFFIX,docker.com,PROXY
+DOMAIN-SUFFIX,npmjs.org,PROXY
+DOMAIN-SUFFIX,npmjs.com,PROXY
+DOMAIN-SUFFIX,yarnpkg.com,PROXY
+DOMAIN-SUFFIX,pypi.org,PROXY
+DOMAIN-SUFFIX,registry.npmmirror.com,PROXY
+
+# --- 12.3 Developer Communities ---
+DOMAIN-SUFFIX,stackoverflow.com,PROXY
+DOMAIN-SUFFIX,stackexchange.com,PROXY
+DOMAIN-SUFFIX,medium.com,PROXY
+DOMAIN-SUFFIX,dev.to,PROXY
+
+# ┌──────────────────────────────────────────────────────┐
+# │  PHẦN 13: TỐI ƯU KẾT NỐI (DIRECT - BỎ QUA VPN)       │
+# └──────────────────────────────────────────────────────┘
+
+# --- 13.1 Apple Services (Bypass for max speed & stability) ---
+DOMAIN-SUFFIX,mzstatic.com,DIRECT
+DOMAIN-SUFFIX,icloud.com,DIRECT
+DOMAIN-SUFFIX,me.com,DIRECT
+DOMAIN-SUFFIX,apple.com,DIRECT
+
+# --- 13.2 Vietnamese Banking & E-Wallets (Anti-block & Bypass) ---
+DOMAIN-SUFFIX,momo.vn,DIRECT
+DOMAIN-SUFFIX,mservice.com.vn,DIRECT
+DOMAIN-SUFFIX,zalopay.vn,DIRECT
+DOMAIN-SUFFIX,vnpay.vn,DIRECT
+DOMAIN-SUFFIX,vietcombank.com.vn,DIRECT
+DOMAIN-SUFFIX,techcombank.com.vn,DIRECT
+DOMAIN-SUFFIX,mbbank.com.vn,DIRECT
+DOMAIN-SUFFIX,tpb.vn,DIRECT
+DOMAIN-SUFFIX,vpbank.com.vn,DIRECT
+DOMAIN-SUFFIX,bidv.com.vn,DIRECT
+DOMAIN-SUFFIX,vtb.vn,DIRECT
+DOMAIN-SUFFIX,vietinbank.vn,DIRECT
+DOMAIN-SUFFIX,agribank.com.vn,DIRECT
+DOMAIN-SUFFIX,acb.com.vn,DIRECT
+DOMAIN-SUFFIX,vib.com.vn,DIRECT
+DOMAIN-SUFFIX,sacombank.com.vn,DIRECT
+DOMAIN-SUFFIX,hdbank.com.vn,DIRECT
+DOMAIN-SUFFIX,ocb.com.vn,DIRECT
+DOMAIN-SUFFIX,shb.com.vn,DIRECT
+DOMAIN-SUFFIX,msb.com.vn,DIRECT
+DOMAIN-SUFFIX,lpbank.com.vn,DIRECT
+DOMAIN-SUFFIX,eximbank.com.vn,DIRECT
+DOMAIN-SUFFIX,namabank.com.vn,DIRECT
+DOMAIN-SUFFIX,seabank.com.vn,DIRECT
+DOMAIN-SUFFIX,cake.vn,DIRECT
+DOMAIN-SUFFIX,vietqr.io,DIRECT
+DOMAIN-SUFFIX,napas.com.vn,DIRECT
+# --- Banking/Ví bổ sung (2026) ---
+DOMAIN-SUFFIX,timo.vn,DIRECT
+DOMAIN-SUFFIX,ubank.vn,DIRECT
+DOMAIN-SUFFIX,scb.com.vn,DIRECT
+DOMAIN-SUFFIX,abbank.vn,DIRECT
+DOMAIN-SUFFIX,pvcombank.com.vn,DIRECT
+DOMAIN-SUFFIX,baovietbank.vn,DIRECT
+DOMAIN-SUFFIX,kienlongbank.com,DIRECT
+DOMAIN-SUFFIX,vietabank.com.vn,DIRECT
+DOMAIN-SUFFIX,bvbank.net.vn,DIRECT
+DOMAIN-SUFFIX,viettelmoney.vn,DIRECT
+DOMAIN-SUFFIX,viettelpay.vn,DIRECT
+DOMAIN-SUFFIX,moca.vn,DIRECT
+DOMAIN-SUFFIX,shopeepay.vn,DIRECT
+DOMAIN-SUFFIX,smartpay.vn,DIRECT
+
+# --- 13.3 Popular Vietnamese Apps (Lightning fast local access) ---
+DOMAIN-SUFFIX,zalo.me,DIRECT
+DOMAIN-SUFFIX,zaloapp.com,DIRECT
+DOMAIN-SUFFIX,shopee.vn,DIRECT
+DOMAIN-SUFFIX,shopeemobile.com,DIRECT
+DOMAIN-SUFFIX,tiki.vn,DIRECT
+DOMAIN-SUFFIX,lazada.vn,DIRECT
+DOMAIN-SUFFIX,grab.com,DIRECT
+DOMAIN-SUFFIX,be.com.vn,DIRECT
+DOMAIN-SUFFIX,fpt.vn,DIRECT
+DOMAIN-SUFFIX,vnexpress.net,DIRECT
+
+# --- 13.4 Vietnam Local Network & GeoIP (Lightning fast local traffic) ---
+DOMAIN-SUFFIX,vn,DIRECT
+GEOIP,VN,DIRECT
+
+[Header Rewrite]
+# === YOUTUBE NONCE ===
+^https?://www\.youtube\.com/youtubei/v1/player header-replace x-youtube-client-version 2.20240101.00.00
+# === REVENUECAT REMOVE ETAG (Locket Gold + all RC apps) ===
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/?(.*?)*$) header-del x-revenuecat-etag
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/?(.*?)*$) header-del X-RevenueCat-ETag
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers\/?(.*?)*$) header-del x-revenuecat-etag
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers\/?(.*?)*$) header-del X-RevenueCat-ETag
+
+# === SPOTIFY REMOVE CACHE HEADERS ===
+^https:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:443)?)\/user-customization-service\/v1\/customize$ header-del if-none-match
+
+[URL Rewrite]
+# === YOUTUBE - Block ads and tracking ===
+^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad _ reject-200
+^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads _ reject-200
+^https?:\/\/(www|s)\.youtube\.com\/(pagead|ptracking) _ reject-200
+^https?:\/\/s\.youtube\.com\/api\/stats\/qoe\?adcontext _ reject-200
+(^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+) $1$2$3 302
+
+[Map Local]
+# === YOUTUBE - Block initplayback preroll ads ===
+^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&oad data-type=text data="" status-code=200
+
+[Script]
+# === YOUTUBE PREMIUM - ekaznyra Version (2026-05-09) ===
+# Blocks all ads + enables background playback + PiP
+youtube.request = type=http-request, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|reel\/reel_watch_sequence|get_watch), requires-body=1, max-size=-1, binary-body-mode=1, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/youtube.response.js
+
+youtube.response = type=http-response, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch), requires-body=1, max-size=-1, binary-body-mode=1, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/youtube.response.js, argument={"lyricLang":"vi","captionLang":"vi","blockUpload":false,"blockImmersive":false,"debug":false}
+
+# ===== Spotify iOS15 (app2smile) =====
+spotify-json = type=http-request, pattern=^https:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:443)?)\/(artistview\/v1\/artist|album-entity-view\/v2\/album)\/, requires-body=0, script-path=https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-json.js
+spotify-proto = type=http-response, pattern=^https:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:443)?)\/(bootstrap\/v1\/bootstrap|user-customization-service\/v1\/customize)$, requires-body=1, binary-body-mode=1, max-size=0, script-path=https://raw.githubusercontent.com/app2smile/rules/master/js/spotify-proto.js, script-update-interval=0
+
+# === SOUNDCLOUD GO+ - Marol62926/MarScrpt (yfamilys, 2026-05-19) ===
+soundcloud-response = type=http-response, pattern=^https?:\/\/api-mobile\.soundcloud\.com\/configuration\/ios, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/soundcloud.js, requires-body=1, max-size=0, timeout=15
+
+# === PICSART GOLD - ekaznyra (2026-04-21) ===
+picsart-response = type=http-response, pattern=^https:\/\/api\.picsart\.com\/gw-v2\/shop\/subscription\/apple\/purchases, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/PicsArt.js, requires-body=1, max-size=0, timeout=60
+picsart-storages = type=http-response, pattern=^https:\/\/api\.picsart\.com\/gw-v2\/cloud-storage\/v1\/me\/storages, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/PicsArt.js, requires-body=1, max-size=0, timeout=60
+
+# === PICSART (NobyDa show/me endpoint) - yfamilys (2026-05-19) ===
+picsart-nobyda = type=http-response, pattern=^https?:\/\/api\.(picsart|meiease)\.c(n|om)\/users\/show\/me\.json, script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Surge/JS/PicsArt.js, requires-body=1, max-size=0, timeout=60
+
+# === LIGHTROOM PREMIUM - litieyin/AD_VIP (yfamilys, 2026-05-19) ===
+lightroom-response = type=http-response, pattern=^https:\/\/photos\.adobe\.io\/v2\/accounts, script-path=https://raw.githubusercontent.com/litieyin/AD_VIP/main/Script/lightroom.js, requires-body=1, timeout=10, max-size=131072
+
+# === PHOTOSHOP EXPRESS PREMIUM - ekaznyra (2026-05-09) ===
+photoshop-response = type=http-response, pattern=^https:\/\/lcs-mobile-cops\.adobe\.io\/mobile_profile, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/photoshop.js, requires-body=1, timeout=10, max-size=131072
+
+# === EMBY PREMIERE - ekaznyra (2026-05-09) ===
+emby-response = type=http-response, pattern=^https?:\/\/mb3admin\.com\/admin\/service\/registration\/validateDevice, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/emby.js, requires-body=1, max-size=0, timeout=10
+
+# === KINEMASTER PRO - ekaznyra (2026-04-21) ===
+kinemaster-response = type=http-response, pattern=^https:\/\/api-account\.kinemasters\.com\/v\d\/user\/subscribe$, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/Kinemaster.js, requires-body=1, max-size=0, timeout=10
+
+# === DJAY PRO - ekaznyra (2026-05-09) ===
+djay-response = type=http-response, pattern=^https:\/\/app\.algoriddim\.com\/api\/v1\/validate-receipt, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/djay.js, requires-body=1, timeout=10, max-size=131072
+
+# === CALM PREMIUM - Alex0510/Eric (yfamilys, 2026-05-19) ===
+calm-response = type=http-response, pattern=^https?:\/\/api\.calm\.com\/(me|device|ios\/receipt), script-path=https://raw.githubusercontent.com/Alex0510/Eric/Alex0510/surge/surge/Script/caml.js, requires-body=1, max-size=0, timeout=10
+
+# === BUSUU PREMIUM - ekaznyra (2026-05-09) ===
+busuu-response = type=http-response, pattern=^https:\/\/api\.busuu\.com\/users\/me, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/bussu.js, requires-body=1, timeout=10, max-size=131072
+
+# === HEADSPACE PREMIUM - ekaznyra (2026-05-09) ===
+headspace-response = type=http-response, pattern=^https:\/\/api\.prod\.headspace\.com\/.*\/user-subscriptions, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/headspace.js, requires-body=1, timeout=10, max-size=131072
+
+# === ALIGHT MOTION PRO - ekaznyra (2026-04-21) ===
+alightmotion-response = type=http-response, pattern=^https:\/\/us-central1-alight-creative\.cloudfunctions\.net\/getAccountStatusAndLicenses, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/AlightMotion.js, requires-body=1, max-size=0, timeout=10
+
+# === WINK FOREVER VIP - yqc007 / yfamilys (2026-05-19) ===
+wink-response = type=http-response, pattern=^https?:\/\/api-sub\.meitu\.com\/v2\/user\/vip_info_by_group\.json, requires-body=1, max-size=0, timeout=10, script-path=https://raw.githubusercontent.com/yqc007/QuantumultX/master/WinkForeverVipCrack.js
+
+# === TRUECALLER PREMIUM - ekaznyra (2026-04-21) ===
+truecaller-response = type=http-response, pattern=^https:\/\/premium-(.+)\.truecaller\.com\/v\d\/(subscriptions|products\/apple), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/TrueCaller.js, requires-body=1, max-size=0, timeout=10
+
+# === CAMSCANNER PREMIUM - ekaznyra (2026-04-21) ===
+camscanner-response = type=http-response, pattern=^https:\/\/(api|api-cs.*)\.intsig\.net\/(purchase\/cs\/query_prop|queryProperty|getPrivilegeItem), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/camScanner.js, requires-body=1, max-size=0, timeout=15
+
+# === BEAUTYPLUS PREMIUM - ekaznyra (2026-04-21) ===
+beautyplus-response = type=http-response, pattern=^https:\/\/(api\.mr\.pixocial\.com\/v1\/manual_unlock|newbeee-api\.beautyplus\.com\/api\/v1\/asset\/balance), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/BeautyPlus.js, requires-body=1, timeout=60, max-size=0
+
+# === REVENUECAT MULTI-APP (Locket Gold) - ekaznyra (2026-04-21) ===
+revenuecat-response = type=http-response, pattern=^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/[^\/]+$), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/revenuecat_multi.js, requires-body=1, timeout=60, max-size=-1
+
+# === REVENUECAT BACKUP DOMAIN (rc-backup fallback) - ekaznyra (2026-05-09) ===
+revenuecat-backup = type=http-response, pattern=^https:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers\/[^\/]+$), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/revenuecat_multi.js, requires-body=1, max-size=-1, timeout=60
+
+# === VSCO PREMIUM - ekaznyra (2026-05-09) ===
+vsco-response = type=http-response, pattern=^https:\/\/vsco\.co\/api\/subscriptions\/2\.1\/user-subscriptions, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/VSCO.js, requires-body=1, timeout=10, max-size=131072
+
+# === FUNIMATE PRO - ekaznyra (2026-05-09) ===
+funimate-response = type=http-response, pattern=^https:\/\/api\.funimate\.com\/users\/me, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/funimate.js, requires-body=1, timeout=10, max-size=131072
+
+# === ITUNES PREMIUM (250+ Apps) - ekaznyra (2026-05-09) ===
+itunes-response = type=http-response, pattern=^https?:\/\/buy\.itunes\.apple\.com\/verifyReceipt$, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/iTunes.js, requires-body=1, max-size=-1, timeout=60
+
+# === SNOW PREMIUM - ekaznyra (2026-05-09) ===
+snow-response = type=http-response, pattern=^https?:\/\/user-snow-api\.snow\.me\/v\d\/purchase\/subscription\/subscriber\/status, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/Snow.js, requires-body=1, max-size=-1, timeout=60
+
+# === B612 KAJI VIP - ddgksf2013 (yfamilys, 2026-05-19) ===
+b612-response = type=http-response, pattern=^https?:\/\/user-kaji-api\.b612kaji\.com\/v\d\/purchase\/subscription\/subscriber\/status, script-path=https://github.com/deezertidal/private/raw/master/js-backup/Crack/612.js, requires-body=1, max-size=-1, timeout=60
+
+# === MEITU XIUXIU PREMIUM - ekaznyra (2026-05-09) ===
+meitu-response = type=http-response, pattern=^https?:\/\/(h5|api)\.xiuxiu\.meitu\.com\/v\d\/(h\d\/vip|vip|user)\/, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/MeiTuXiuXiu.js, requires-body=1, max-size=0, timeout=60
+
+# === WPS OFFICE PREMIUM - I-am-R-E (yfamilys, 2026-05-19) ===
+wps-response = type=http-response, pattern=^https?:\/\/.*?account\.wps\.(com|cn)(:\d+)?\/api\/users\/\w+\/overview$, script-path=https://raw.githubusercontent.com/I-am-R-E/Functional-Store-Hub/Master/WPSOffice/Script/WPS.js, requires-body=1, max-size=0, timeout=10
+
+# === XMIND PREMIUM - ekaznyra (2026-05-09) ===
+xmind-response = type=http-response, pattern=^https?:\/\/www\.xmind\.(cn|net|app)\/_res\/devices, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/xmind.js, requires-body=1, max-size=0, timeout=10
+
+# === ALARMY PREMIUM ===
+alarmy-response = type=http-response, pattern=^https:\/\/ars\.alar\.my\/api\/v2\/user\/sync, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/alarmy.js, requires-body=1, max-size=0, timeout=10
+
+# === GRAMMARLY PREMIUM - yqc007 (yfamilys, 2026-05-19) ===
+grammarly-response = type=http-response, pattern=^https?:\/\/subscription\.grammarly\.com\/api\/v1\/subscription$, script-path=https://raw.githubusercontent.com/yqc007/QuantumultX/master/GrammarlyPremiumCrack.js, requires-body=1, max-size=0, timeout=10
+
+# === NOTABILITY PLUS - litieyin (yfamilys, 2026-05-19) ===
+notability-response = type=http-response, pattern=^https:\/\/notability\.com\/subscriptions, script-path=https://raw.githubusercontent.com/litieyin/AD_VIP/main/Script/notability.js, requires-body=1, max-size=0, timeout=10
+
+# === PHOTOMATH PLUS - ddgksf2013 (yfamilys, 2026-05-19) ===
+photomath-response = type=http-response, pattern=^https?:\/\/lapi\.photomath\.net\/v4\/me, script-path=https://raw.githubusercontent.com/deezertidal/private/master/js-backup/Crack/poh.js, requires-body=1, max-size=0, timeout=10
+
+# === SMALLPDF PRO - Marol62926 (yfamilys, 2026-05-19) ===
+smallpdf-response = type=http-response, pattern=^https?:\/\/pro\.smallpdf\.com\/pro\/account, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/smallpdf.js, requires-body=1, max-size=0, timeout=10
+
+# === PEAK PRO - chamberlen (yfamilys, 2026-05-19) ===
+peak-response = type=http-response, pattern=^https:\/\/billing\.peakcloud\.org\/billing\/2\/user\/me, script-path=https://raw.githubusercontent.com/deezertidal/shadowrocket-rules/main/js/peak.js, requires-body=1, max-size=0, timeout=10
+
+# === POLARR PRO - NobyDa (yfamilys, 2026-05-19) ===
+polarr-response = type=http-response, pattern=^https:\/\/api\.polaxiong\.com\/v1\/payments\/appleiap\/receipts\/confirmation, script-path=https://raw.githubusercontent.com/NobyDa/Script/master/Surge/JS/Polarr.js, requires-body=1, max-size=0, timeout=10
+
+# === MYFITNESSPAL PREMIUM - Marol62926 (yfamilys, 2026-05-19) ===
+myfitnesspal-response = type=http-response, pattern=^https?:\/\/premium-api\.myfitnesspal\.com\/v3\/subscriptions\/MFP\/, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/myFitnessPal.js, requires-body=1, max-size=0, timeout=10
+
+# === MUSIXMATCH PREMIUM - Marol62926 (yfamilys, 2026-05-19) ===
+musixmatch-response = type=http-response, pattern=^https?:\/\/apic\.musixmatch\.com\/ws\/1\.1\/config\.get, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/musixmatch.js, requires-body=1, max-size=0, timeout=10
+
+# === FIMO CAMERA - ddgksf2013 (yfamilys, 2026-05-19) ===
+fimo-response = type=http-response, pattern=^https:\/\/server\.yoyiapp\.com\/fimo-user\/user$, script-path=https://github.com/deezertidal/private/raw/master/js-backup/Crack/fimo.js, requires-body=1, max-size=0, timeout=10
+
+# === VARLENS PREMIUM - I-am-R-E (yfamilys, 2026-05-19) ===
+varlens-response = type=http-response, pattern=^https:\/\/mid\.zineapi\.com\/@varlens\/api\/user\/info\/, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Varlens.js, requires-body=1, max-size=0, timeout=10
+
+# === SUB-STORE (Node Management) ===
+sub-store-core = type=http-request, pattern=^https?:\/\/sub\.store\/((download)|api\/(preview|sync|(utils\/node-info))), script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-1.min.js, requires-body=1, timeout=120
+sub-store-simple = type=http-request, pattern=^https?:\/\/sub\.store, script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store-0.min.js, requires-body=1, timeout=10
+sub-store-sync = type=cron, cronexp=0 0 * * *, wake-system=1, timeout=120, script-path=https://github.com/sub-store-org/Sub-Store/releases/latest/download/cron-sync-artifacts.min.js
+
+# ┌──────────────────────────────────────────────────────────────────┐
+# │  NOTE: Darkroom, PhotoRoom, Pixelcut, Mojo, Audiomack, Spark,  │
+# │  ColorWidgets, WidgetSmith, TouchRetouch, Emote                │
+# │  → Handled by revenuecat_multi.js (generic fallback L47-51)    │
+# │  OldRoll, Pandora, Beelinguapp, Relens                         │
+# │  → Handled by iTunes.js (250+ apps fallback L391-432)          │
+# │  Separate scripts REMOVED to avoid endpoint conflicts.         │
+# └──────────────────────────────────────────────────────────────────┘
+
+# === BOOM EQUALIZER - ddgksf2013 (yfamilys, 2026-05-24) ===
+boom-response = type=http-response, pattern=^https:\/\/apimboom2\.globaldelight\.net\/itunesreceipt_v2\.php$, script-path=https://github.com/deezertidal/private/raw/master/js-backup/Crack/boom.js, requires-body=1, max-size=0, timeout=10
+
+# === FANTASTICAL PREMIUM - ddgksf2013 (yfamilys, 2026-05-24) ===
+fantastical-response = type=http-response, pattern=^https:\/\/api\.flexibits\.com\/(v1\/auth\/device|v1\/account\/details), script-path=https://raw.githubusercontent.com/deezertidal/private/master/js-backup/Crack/fantastical.js, requires-body=1, max-size=0, timeout=10
+
+# === CRAFT PREMIUM - 89996462 (yfamilys, 2026-05-24) ===
+craft-response = type=http-response, pattern=^https:\/\/api\.craft\.do\/auth\/v2\/profile, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Craft.js, requires-body=1, max-size=0, timeout=10
+
+# === DAY ONE PREMIUM - 89996462 (yfamilys, 2026-05-24) ===
+dayone-response = type=http-response, pattern=^https?:\/\/dayone\.app\/api\/v2\/users\/(receipt|account-status), script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/dayone.js, requires-body=1, max-size=0, timeout=10
+
+# === NICEGRAM PREMIUM - I-am-R-E (yfamilys, 2026-05-24) ===
+nicegram-request = type=http-request, pattern=^https?:\/\/restore-access\.indream\.app\/restoreAccess\?id=\w+$, script-path=https://raw.githubusercontent.com/I-am-R-E/Functional-Store-Hub/Master/Nicegram/Script/Nicegram.js, requires-body=0, max-size=0, timeout=10
+
+# === ILOVEPDF PREMIUM - Marol62926 (yfamilys, 2026-05-24) ===
+ilovepdf-response = type=http-response, pattern=^https?:\/\/service\.ilovepdf\.com\/v1\/user, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/lovePdf.js, requires-body=1, max-size=0, timeout=10
+
+# === MONDLY PREMIUM - 89996462 (yfamilys, 2026-05-24) ===
+mondly-response = type=http-response, pattern=^https:\/\/api\.mondlylanguages\.com\/v3\/ios\/user\/sync, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Mondly.js, requires-body=1, max-size=0, timeout=10
+
+# === MEMRISE PREMIUM - 89996462 (yfamilys, 2026-05-24) ===
+memrise-response = type=http-response, pattern=^https:\/\/api\.memrise\.com\/v1\.18, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Memrise.js, requires-body=1, max-size=0, timeout=10
+
+# === ALOHA BROWSER PREMIUM - Marol62926 (yfamilys, 2026-05-24) ===
+aloha-response = type=http-response, pattern=^https?:\/\/api\.alohaprofile\.com\/v1\/profile_info, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/aloha.js, requires-body=1, max-size=0, timeout=10
+
+# === DAILY YOGA PREMIUM - Marol62926 (yfamilys, 2026-05-24) ===
+dailyyoga-response = type=http-response, pattern=^https?:\/\/pre\.dailyyoga\.com\/h2oapi\/user\/getUserDetail, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/dailyYoga.js, requires-body=1, max-size=0, timeout=10
+
+# === ACCUWEATHER PREMIUM - Marol62926 (yfamilys, 2026-05-24) ===
+accuweather-response = type=http-response, pattern=^https?:\/\/app-subscription-proxy\.accuweather\.com\/subscriptions\/v1\/apple\/validate, script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/accuWeather.js, requires-body=1, max-size=0, timeout=10
+
+# === ENDEL FOCUS/SLEEP - 89996462 (yfamilys, 2026-05-24) ===
+endel-response = type=http-response, pattern=^https:\/\/api-production\.endel\.io\/v4\/call, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Endel.js, requires-body=1, max-size=0, timeout=10
+
+# === FLOMO NOTES - 89996462 (yfamilys, 2026-05-24) ===
+flomo-response = type=http-response, pattern=^https:\/\/flomoapp\.com\/api\/v1\/user\/me, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/flomo.js, requires-body=1, max-size=0, timeout=10
+
+# === DRAFTS PRO - 89996462 (yfamilys, 2026-05-24) ===
+drafts-response = type=http-response, pattern=^https:\/\/backend\.getdrafts\.com\/api\/v1\/verification\/verify_receipt, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Drafts.js, requires-body=1, max-size=0, timeout=10
+
+# === KEEP FITNESS PREMIUM - 89996462 (yfamilys, 2026-05-24) ===
+keep-response = type=http-response, pattern=^https:\/\/api\.gotokeep\.com, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/keep.js, requires-body=1, max-size=0, timeout=10
+
+# === INVIDEO PREMIUM - Marol62926 (yfamilys, 2026-05-24) ===
+invideo-response = type=http-response, pattern=^https?:\/\/payments\.invideo\.io\/(verify_purchase|subscription), script-path=https://raw.githubusercontent.com/Marol62926/MarScrpt/main/filmr.js, requires-body=1, max-size=0, timeout=10
+
+# ============================================================
+# === BỔ SUNG APP MỚI (2026-06-02) — endpoint riêng, đã xác minh ===
+# ============================================================
+
+# === iTRANSLATE PRO (dịch thuật) - 89996462 ===
+itranslate-request = type=http-request, pattern=^https:\/\/ssl-api\.itranslateapp\.com\/accounts\/v\d\/subscriptions\/verify\/ios, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/iTranslate.js, requires-body=1, max-size=0, timeout=10
+
+# === LINGVIST HỌC NGOẠI NGỮ - 89996462 ===
+lingvist-response = type=http-response, pattern=^https:\/\/payment-api\.lingvist\.com\/.+\/user\/services, script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Lingvist.js, requires-body=1, max-size=0, timeout=10
+
+# === BENDING SPOONS BUNDLE (Splice, Remini, FilmicPro, Focos, 30DayFitness...) - 89996462 ===
+bendingspoons-response = type=http-response, pattern=^https?:\/\/.*\.oracle\.bendingspoonsapps\.com\/v\d\/(users\/.+|purchases\/verify), script-path=https://raw.githubusercontent.com/89996462/Quantumult-X/main/ycdz/Focos.js, requires-body=1, max-size=0, timeout=10
+
+[MITM]
+enable = true
+hostname = %APPEND% *.googlevideo.com, youtubei.googleapis.com, www.youtube.com, s.youtube.com, spclient.wg.spotify.com, *-spclient.spotify.com, api.revenuecat.com, api.rc-backup.com, buy.itunes.apple.com, api.picsart.com, api.picsart.cn, api.meiease.com, api.meiease.cn, api-mobile.soundcloud.com, mb3admin.com, api-account.kinemasters.com, photos.adobe.io, lcs-mobile-cops.adobe.io, app.algoriddim.com, api.calm.com, api.busuu.com, api.prod.headspace.com, vsco.co, api.funimate.com, us-central1-alight-creative.cloudfunctions.net, api-sub.meitu.com, premium*.truecaller.com, ap*.intsig.net, api.mr.pixocial.com, newbeee-api.beautyplus.com, user-snow-api.snow.me, user-kaji-api.b612kaji.com, h5.xiuxiu.meitu.com, api.xiuxiu.meitu.com, account.wps.cn, *account.wps.com, www.xmind.cn, www.xmind.net, www.xmind.app, ars.alar.my, sub.store, subscription.grammarly.com, notability.com, lapi.photomath.net, pro.smallpdf.com, billing.peakcloud.org, api.polaxiong.com, premium-api.myfitnesspal.com, apic.musixmatch.com, server.yoyiapp.com, mid.zineapi.com, apimboom2.globaldelight.net, api.flexibits.com, api.craft.do, dayone.app, restore-access.indream.app, service.ilovepdf.com, api.mondlylanguages.com, api.memrise.com, api.alohaprofile.com, pre.dailyyoga.com, app-subscription-proxy.accuweather.com, api-production.endel.io, flomoapp.com, backend.getdrafts.com, api.gotokeep.com, payments.invideo.io, ssl-api.itranslateapp.com, payment-api.lingvist.com, *.oracle.bendingspoonsapps.com
