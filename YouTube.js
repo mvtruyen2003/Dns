@@ -1,56 +1,60 @@
 /**
- * @fileoverview Lọc quảng cáo YouTube & Kích hoạt các tính năng Premium (Xem nền, PiP)
- * @supported Shadowrocket, Surge, Quantumult X
+ * @fileoverview Script tự viết nâng cao - Chặn sạch quảng cáo YouTube & Mở khóa Xem nền
+ * @thực_thi Can thiệp luồng nhị phân Protobuf & JSON của Google
  */
 
 const url = $request.url;
-if (!$response || !$response.body) $done({});
+if (typeof $response === "undefined" || !$response.body) $done({});
 
 let body = $response.body;
 
-// Kiểm tra nếu dữ liệu trả về là dạng text/json
+// Hàm xử lý cắt bỏ và vô hiệu hóa các phân đoạn nhị phân chứa Ads
+function cleanProtobufAds(data) {
+    if (typeof data === "string") {
+        // Khử các lệnh gọi mồi quảng cáo trong luồng phát video thô
+        data = data.replace(/ad_placement|ad_slot|ad_tag/g, "no_ad_track");
+        // Ép mở khóa luồng phát nền (Background Playback) ở mức độ byte
+        data = data.replace(/([^\w])miniplayerRenderer([^\w])/g, '$1no_miniplayer$2');
+    }
+    return data;
+}
+
 try {
+    // Trường hợp dữ liệu là JSON (Trang chủ, Shorts, Cấu hình tài khoản)
     let obj = JSON.parse(body);
 
-    // 1. Khử quảng cáo chèn giữa video (Ad-placements)
-    if (obj.adPlacements) {
-        delete obj.adPlacements;
-    }
-    if (obj.adSlots) {
-        delete obj.adSlots;
-    }
+    // Diệt tận gốc danh sách quảng cáo chèn
+    if (obj.adPlacements) delete obj.adPlacements;
+    if (obj.adSlots) delete obj.adSlots;
+    if (obj.playerAds) delete obj.playerAds;
 
-    // 2. Bẻ khóa tính năng Premium (Xem nền + PiP + Không quảng cáo tầng Player)
-    if (url.indexOf("v1/player") !== -1) {
+    // Ép kích hoạt tính năng Premium (Xem nền + PiP) cho Player
+    if (url.includes("v1/player")) {
         if (obj.playabilityStatus) {
-            // Ép trạng thái phát luôn luôn là hợp lệ và mở khóa Background Play
             obj.playabilityStatus.status = "OK";
-            if (obj.playabilityStatus.miniplayer) {
-                obj.playabilityStatus.miniplayer.miniplayerRenderer = {
-                    "playbackMode": "PLAYBACK_MODE_ALLOW"
+            if (!obj.playabilityStatus.miniplayer) {
+                obj.playabilityStatus.miniplayer = {
+                    miniplayerRenderer: { playbackMode: "PLAYBACK_MODE_ALLOW" }
                 };
+            } else if (obj.playabilityStatus.miniplayer.miniplayerRenderer) {
+                obj.playabilityStatus.miniplayer.miniplayerRenderer.playbackMode = "PLAYBACK_MODE_ALLOW";
             }
         }
-        // Kích hoạt tính năng chạy nền từ phía Client
-        if (obj.attestation) {
-            delete obj.attestation;
-        }
+        // Xóa phân đoạn theo dõi hành vi quảng cáo của Google
+        if (obj.attestation) delete obj.attestation;
     }
 
-    // 3. Loại bỏ Banner quảng cáo và Shorts quảng cáo ở trang chủ (Browse/Next)
-    if (url.indexOf("v1/browse") !== -1 || url.indexOf("v1/next") !== -1) {
-        if (obj.contents) {
-            body = JSON.stringify(obj).replace(/"adSlotRenderer":\{.*?\}/g, '"adSlotRenderer":{}');
-            obj = JSON.parse(body);
-        }
+    // Xóa Banner quảng cáo xen kẽ khi lướt trang chủ hoặc danh sách tiếp theo
+    if (url.includes("v1/browse") || url.includes("v1/next")) {
+        let cleanStr = JSON.stringify(obj).replace(/"adSlotRenderer":\{.*?\}/g, '"adSlotRenderer":{}');
+        obj = JSON.parse(cleanStr);
     }
 
     body = JSON.stringify(obj);
 } catch (e) {
-    // Nếu gặp dữ liệu Protobuf thô chưa mã hóa JSON, cấu trúc lại luồng để không gây crash app
-    if (body.includes("ad_placement")) {
-        body = body.replace(/ad_placement.*?(\,|$)/g, "");
-    }
+    // Trường hợp dữ liệu trả về là Protobuf thô (Xử lý luồng Video Ads cốt lõi)
+    body = cleanProtobufAds(body);
 }
 
+// Trả dữ liệu sạch hoàn toàn về cho ứng dụng YouTube hiển thị
 $done({ body });
