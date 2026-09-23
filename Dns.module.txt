@@ -1,0 +1,174 @@
+#!name=Dns
+#!desc=
+#!system=ios
+
+[General]
+# === Shadowrocket / Surge: Giảm trễ push notification & tránh lỗi hệ thống ===
+bypass-system = true
+
+# === HỆ THỐNG DNS MÃ HÓA CHẶN QUẢNG CÁO ĐỈNH CAO (DoH AdGuard + ControlD) ===
+dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
+hijack-dns = *:53
+private-ip-answer = true
+icmp-auto-reply = true
+udp-policy-not-supported-behaviour = REJECT
+always-real-ip = *.srv.nintendo.net, *.stun.playstation.net, xbox.*.microsoft.com, *.xboxlive.com, *.turn.apple.com, *.stun.services.mozilla.com
+skip-proxy = %APPEND% 127.0.0.1, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 100.64.0.0/10, 17.0.0.0/8, localhost, *.local, *.lan, captive.apple.com, detectportal.firefox.com, connectivitycheck.gstatic.com, clients3.google.com, 
+tun-excluded-routes = %APPEND% 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24, 192.0.2.0/24, 192.88.99.0/24, 192.168.0.0/16, 198.51.100.0/24, 203.0.113.0/24, 224.0.0.0/4, 255.255.255.255/32, 239.255.255.250/32
+force-http-engine-hosts = %APPEND% api.revenuecat.com:443, api.rc-backup.com:443, api-mobile.soundcloud.com:443, api.remini.ai:443, api.bazaart.me:443, youtubei.googleapis.com:443, www.youtube.com:443, s.youtube.com:443, spclient.wg.spotify.com:443, *-spclient.spotify.com:443, gads.current.spotify.com:443, api.spotify.com:443
+
+[Rule]
+# === SPOTIFY DIRECT DOMAINS (PERFECT PLAYBACK - NO AUDIO DROP) ===
+DOMAIN,accounts.spotify.com,DIRECT
+DOMAIN,login5.spotify.com,DIRECT
+DOMAIN,auth.spotify.com,DIRECT
+DOMAIN,apresolve.spotify.com,DIRECT
+DOMAIN,api.spotify.com,DIRECT
+DOMAIN-SUFFIX,scdn.co,DIRECT
+DOMAIN-SUFFIX,spotifycdn.net,DIRECT
+DOMAIN-SUFFIX,spotifycdn.com,DIRECT
+
+# === BLOCK QUIC FOR YOUTUBE & SPOTIFY ===
+AND,((DOMAIN-SUFFIX,googlevideo.com), (PROTOCOL,UDP)),REJECT
+AND,((DOMAIN,youtubei.googleapis.com), (PROTOCOL,UDP)),REJECT
+AND,((DOMAIN-KEYWORD,spotify), (PROTOCOL,UDP)),REJECT
+
+# === BLOCK WEBRTC LEAK ===
+DOMAIN-SUFFIX,stun.l.google.com,REJECT
+DOMAIN-SUFFIX,stun1.l.google.com,REJECT
+DOMAIN-SUFFIX,stun2.l.google.com,REJECT
+DOMAIN-SUFFIX,stun3.l.google.com,REJECT
+DOMAIN-SUFFIX,stun4.l.google.com,REJECT
+
+# === BLOCK iOS OTA UPDATES (Triệt để) ===
+DOMAIN,mesu.apple.com,REJECT
+DOMAIN,gdmf.apple.com,REJECT
+DOMAIN,updates-http.apple.com,REJECT
+DOMAIN,appldnld.apple.com,REJECT
+DOMAIN,swcdn.apple.com,REJECT
+DOMAIN,xp.apple.com,REJECT
+
+# === BLOCK APP STORE SEARCH ADS ===
+DOMAIN,searchads.apple.com,REJECT
+DOMAIN,iad.apple.com,REJECT
+DOMAIN,iadsdk.apple.com,REJECT
+
+# === BLOCK SPOTIFY ADS & TRACKERS 100% ===
+DOMAIN-SUFFIX,audio-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,audio4-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,heads-ak-spotify-com.akamaized.net,REJECT
+DOMAIN-SUFFIX,heads4-ak-spotify-com.akamaized.net,REJECT
+DOMAIN,spclient.wg.spotify.com,DIRECT
+DOMAIN-KEYWORD,spotify-ads,REJECT
+DOMAIN-SUFFIX,ads-fa.spotify.com,REJECT
+DOMAIN-SUFFIX,analytics.spotify.com,REJECT
+DOMAIN-SUFFIX,adeventtracker.spotify.com,REJECT
+DOMAIN-SUFFIX,log.spotify.com,REJECT
+DOMAIN-SUFFIX,creativeservice-production.scdn.co,REJECT
+DOMAIN-SUFFIX,gads.current.spotify.com,REJECT
+
+# === BLOCK SPOTIFY PODCAST ADS & CANVAS ===
+DOMAIN,audio-sp-sto.pscdn.co,REJECT
+DOMAIN,audio-sp-ash.pscdn.co,REJECT
+DOMAIN,audio-sp-dca.pscdn.co,REJECT
+DOMAIN,audio-sp-lon.pscdn.co,REJECT
+DOMAIN,podcastads.spotify.com,REJECT
+
+# ===========================================================
+# === CHẶN QUẢNG CÁO + CỜ BẠC/CÁ ĐỘ + LỪA ĐẢO (API RULE-SET) ===
+# ===========================================================
+
+# --- Ngân hàng & Ví điện tử VN (PIN DIRECT, không bao giờ bị chặn nhầm) ---
+RULE-SET,https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Rules/Banking_VN.list,DIRECT
+
+
+
+# --- Định tuyến AI Services ---
+RULE-SET,https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Rules/AI_Proxy.list,PROXY
+
+
+
+# --- Dịch vụ nội địa (Ngân hàng, App VN, Apple CDN) kết nối trực tiếp ---
+RULE-SET,https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Rules/Direct.list,DIRECT
+
+# --- Gaming DIRECT (Giảm ping, không qua Proxy) ---
+RULE-SET,https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Rules/Gaming_Direct.list,DIRECT
+
+# --- GeoIP Việt Nam → DIRECT (Tối ưu traffic nội địa) ---
+GEOIP,VN,DIRECT
+
+FINAL,DIRECT
+
+[Header Rewrite]
+# === REVENUECAT REMOVE ETAG (APPLIES TO LOCKET + 70+ REVENUECAT APPS) ===
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del X-RevenueCat-ETag
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del x-revenuecat-etag
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del If-None-Match
+^https?:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del If-Modified-Since
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del X-RevenueCat-ETag
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del x-revenuecat-etag
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del If-None-Match
+^https?:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers(\/.*)?\/?) header-del If-Modified-Since
+
+# === ITUNES REMOVE CACHE HEADERS ===
+^https?:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ header-del If-None-Match
+^https?:\/\/buy\.itunes\.apple\.com\/verifyReceipt$ header-del If-Modified-Since
+
+
+
+# === SPOTIFY PROTO REMOVE CACHE HEADERS (CRITICAL for sp-proto script) ===
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/bootstrap\/v1\/bootstrap$ header-del if-none-match
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/user-customization-service\/v1\/customize$ header-del if-none-match
+
+# === SPOTIFY PREMIUM CACHE-BUST (giữ patch /v1/me & identity/v3/me không bị 304 cache đè) ===
+^https?:\/\/api\.spotify\.com\/v1\/me$ header-del If-None-Match
+^https?:\/\/api\.spotify\.com\/v1\/me$ header-del If-Modified-Since
+^https?:\/\/api\.spotify\.com\/v1\/me$ header-del ETag
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/identity\/v3\/me$ header-del If-None-Match
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/identity\/v3\/me$ header-del If-Modified-Since
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/identity\/v3\/me$ header-del ETag
+
+[URL Rewrite]
+# === YOUTUBE ADS ===
+^https?:\/\/[\w-]+\.googlevideo\.com\/(?!(dclk_video_ads|videoplayback\?)).+&oad - reject-200
+^https?:\/\/(www|s)\.youtube\.com\/api\/stats\/ads - reject-200
+^https?:\/\/(www|s)\.youtube\.com\/(pagead|ptracking) - reject-200
+^https?:\/\/s\.youtube\.com\/api\/stats\/qoe\?adcontext - reject-200
+(^https?:\/\/[\w-]+\.googlevideo\.com\/(?!dclk_video_ads).+?)&ctier=L(&.+?),ctier,(.+) $1$2$3 302
+
+# === SPOTIFY ADS REJECT ===
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/ad-logic\/ - reject-200
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/ads\/ - reject-200
+
+# === SPOTIFY CANVAS & STORYLINES BLOCK (Tiết kiệm data & pin) ===
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/canvaz-cache\/ - reject-200
+^https?:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/storylines\/ - reject-200
+
+[Map Local]
+# === YOUTUBE - Block initplayback preroll ads ===
+^https?:\/\/[\w-]+\.googlevideo\.com\/initplayback.+&oad data-type=text data="" status-code=200
+
+[Script]
+# 🎵 Spotify Premium (app2smile — Proto + JSON handler: Mở khóa Premium, bỏ shuffle, chất lượng cao)
+Spotify_JSON = type=http-request, pattern=^https:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/(?:artistview\/v1\/artist|album-entity-view\/v2\/album)\/, requires-body=0, script-path=https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/js/spotify-json.js
+Spotify_Proto = type=http-response, pattern=^https:\/\/(spclient\.wg\.spotify\.com|.*-spclient\.spotify\.com(:\d+)?)\/(?:bootstrap\/v1\/bootstrap|user-customization-service\/v1\/customize)$, requires-body=1, binary-body-mode=1, max-size=0, script-path=https://raw.githubusercontent.com/app2smile/rules/df6366a7024e0b3f0aa3510c5b791eea6f3cba89/js/spotify-proto.js, script-update-interval=0
+Spotify_Premium = type=http-response, pattern=^https:\/\/(api\.spotify\.com\/v1\/me|.*spclient\.spotify\.com\/identity\/v3\/me), requires-body=1, max-size=-1, timeout=30, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/spotify.js
+
+# 👑 RevenueCat Multi-App Unlocker (Locket Gold + 70+ App VIP Quốc tế & Việt Nam)
+RevenueCat_Multi = type=http-response, pattern=^https:\/\/api\.revenuecat\.com\/.+\/(receipts$|subscribers\/[^/]+$), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/revenuecat_multi.js, requires-body=1, max-size=-1, timeout=60
+RevenueCat_Multi_Backup = type=http-response, pattern=^https:\/\/api\.rc-backup\.com\/.+\/(receipts$|subscribers\/[^/]+$), script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/revenuecat_multi.js, requires-body=1, max-size=-1, timeout=60
+
+# 📺 YouTube Premium — Full Response Handler (Chặn QC 100% + Nghe nhạc nền + PiP + Phụ đề Tiếng Việt)
+YouTube_Premium = type=http-response, pattern=^https:\/\/youtubei\.googleapis\.com\/youtubei\/v1\/(browse|next|player|search|reel\/reel_watch_sequence|guide|account\/get_setting|get_watch), requires-body=1, max-size=-1, binary-body-mode=1, timeout=30, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/youtube.response.js, argument={"lyricLang":"vi","captionLang":"vi","blockUpload":false,"blockImmersive":false,"blockShorts":false,"debug":false}
+
+
+
+
+# 🎧 SoundCloud Go+ (Nghe nhạc Lossless chất lượng cao, không QC, tải nhạc offline)
+SoundCloud_Go = type=http-response, pattern=^https?:\/\/api-mobile\.soundcloud\.com\/configuration\/ios, script-path=https://raw.githubusercontent.com/ekaznyra/NguyenNgocAnhTu/master/Module/js/soundcloud.js, requires-body=1, timeout=15
+
+
+
+[MITM]
+enable = true
+hostname = %APPEND% api.revenuecat.com, api.rc-backup.com, buy.itunes.apple.com, api-mobile.soundcloud.com, *.googlevideo.com, www.youtube.com, s.youtube.com, youtubei.googleapis.com, spclient.wg.spotify.com, *-spclient.spotify.com, gads.current.spotify.com, api.spotify.com
