@@ -1,1 +1,27 @@
+[general]
+bypass-system = true
 
+dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
+hijack-dns = *:53
+private-ip-answer = true
+icmp-auto-reply = true
+udp-policy-not-supported-behaviour = REJECT
+
+skip-proxy = %APPEND% 127.0.0.1, 192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12, 100.64.0.0/10, 17.0.0.0/8, localhost, *.local, *.lan, captive.apple.com
+
+# --- Dịch vụ nội địa (Ngân hàng, App VN, Apple CDN) kết nối trực tiếp ---
+RULE-SET,https://raw.githubusercontent.com/mvtruyen2003/Dns/refs/heads/main/Js/Direct.list.txt,DIRECT
+
+GEOIP,VN,DIRECT
+FINAL,DIRECT
+
+[URL Rewrite]
+
+
+[Header Rewrite]
+
+[Map Local]
+
+[Script]
+
+[MITM]
