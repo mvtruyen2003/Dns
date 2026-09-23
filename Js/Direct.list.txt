@@ -1,0 +1,43 @@
+# --- 13.1 System / Apple / captive / push / CDN ---
+# captive.apple.com removed: already covered by DOMAIN-SUFFIX,apple.com below
+DOMAIN,detectportal.firefox.com
+DOMAIN,connectivitycheck.gstatic.com
+DOMAIN,clients3.google.com
+DOMAIN,www.msftconnecttest.com
+DOMAIN,www.msftncsi.com
+DOMAIN-SUFFIX,push.apple.com
+DOMAIN-SUFFIX,ess.apple.com
+DOMAIN-SUFFIX,icloud.com
+DOMAIN-SUFFIX,icloud-content.com
+DOMAIN-SUFFIX,me.com
+DOMAIN-SUFFIX,apple.com
+DOMAIN-SUFFIX,cdn-apple.com
+DOMAIN-SUFFIX,mzstatic.com
+DOMAIN-SUFFIX,aaplimg.com
+DOMAIN-SUFFIX,ls.apple.com
+DOMAIN-SUFFIX,gsp-ssl.ls.apple.com
+
+# --- 13.3 Popular Vietnamese Apps (stable local access, no broad .vn wildcard) ---
+DOMAIN-SUFFIX,zalo.me
+DOMAIN-SUFFIX,zaloapp.com
+DOMAIN-SUFFIX,shopee.vn
+DOMAIN-SUFFIX,shopeemobile.com
+DOMAIN-SUFFIX,tiki.vn
+DOMAIN-SUFFIX,lazada.vn
+DOMAIN-SUFFIX,grab.com
+DOMAIN-SUFFIX,be.com.vn
+DOMAIN-SUFFIX,fpt.vn
+DOMAIN-SUFFIX,vnexpress.net
+# --- Bổ sung VN Apps (07-2026) ---
+DOMAIN-SUFFIX,sendo.vn
+DOMAIN-SUFFIX,gojek.com
+DOMAIN-SUFFIX,baemin.vn
+DOMAIN-SUFFIX,viettel.vn
+DOMAIN-SUFFIX,vnpt.vn
+DOMAIN-SUFFIX,fptplay.vn
+DOMAIN-SUFFIX,galaxyplay.vn
+DOMAIN-SUFFIX,nhaccuatui.com
+DOMAIN-SUFFIX,zing.vn
+DOMAIN-SUFFIX,kenh14.vn
+DOMAIN-SUFFIX,tuoitre.vn
+DOMAIN-SUFFIX,thanhnien.vn
