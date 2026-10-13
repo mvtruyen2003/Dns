@@ -12,8 +12,8 @@ hijack-dns = *:53
 private-ip-answer = true
 icmp-auto-reply = true
 udp-policy-not-supported-behaviour = REJECT
-always-real-ip = %APPEND%, *.srv.nintendo.net, *.stun.playstation.net, *.xboxlive.com, xbox.*.microsoft.com, *.turn.apple.com, *.stun.services.mozilla.com, stun.*, turn.*, *.stun.*, *.turn.*
-skip-proxy = %APPEND% 127.0.0.1, localhost, 10.0.0.0/8, 100.64.0.0/10, 172.16.0.0/12, 192.168.0.0/16, *.local, *.lan, captive.apple.com, detectportal.firefox.com, connectivitycheck.gstatic.com, clients3.google.com
+always-real-ip = %APPEND%,*.srv.nintendo.net,*.stun.playstation.net,*.xboxlive.com,xbox.*.microsoft.com,*.turn.apple.com,*.stun.services.mozilla.com,stun.*,turn.*,*.stun.*,*.turn.*
+skip-proxy = %APPEND%,localhost,10.0.0.0/8,100.64.0.0/10,172.16.0.0/12,192.168.0.0/16,*.local,*.lan,captive.apple.com,detectportal.firefox.com,connectivitycheck.gstatic.com,clients3.google.com,127.0.0.1
 tun-excluded-routes = %APPEND% 10.0.0.0/8, 100.64.0.0/10, 127.0.0.0/8, 169.254.0.0/16, 172.16.0.0/12, 192.0.0.0/24, 192.0.2.0/24, 192.88.99.0/24, 192.168.0.0/16, 198.51.100.0/24, 203.0.113.0/24, 224.0.0.0/4, 255.255.255.255/32, 239.255.255.250/32
 force-http-engine-hosts = %APPEND% api.revenuecat.com:443, api.rc-backup.com:443, api-mobile.soundcloud.com:443, api.remini.ai:443, api.bazaart.me:443, youtubei.googleapis.com:443, www.youtube.com:443, s.youtube.com:443, spclient.wg.spotify.com:443, *-spclient.spotify.com:443, gads.current.spotify.com:443, api.spotify.com:443
 
