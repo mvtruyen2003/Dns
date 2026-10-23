@@ -6,9 +6,11 @@
 
 [General]
 
+# === Shadowrocket / Surge: Giảm trễ push notification & tránh lỗi hệ thống ===
 bypass-system = true
 MTU = 1492
 
+# === HỆ THỐNG DNS MÃ HÓA CHẶN QUẢNG CÁO ĐỈNH CAO
 dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
 fallback-dns-server = 
 hijack-dns = *:53
