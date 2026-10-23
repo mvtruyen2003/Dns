@@ -5,8 +5,10 @@
 
 
 [General]
+
 bypass-system = true
 MTU = 1492
+
 dns-server = https://euw4882anx.cloudflare-gateway.com/dns-query
 fallback-dns-server = 
 hijack-dns = *:53
