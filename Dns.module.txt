@@ -74,6 +74,9 @@ RULE-SET,https://raw.githubusercontent.com/K4Z3X0R/NguyenNgocAnhTu/master/Rules/
 # 5. Chống Lừa đảo & Phishing từ HostsVN
 RULE-SET,https://raw.githubusercontent.com/bigdargon/hostsVN/cd4d77094dd53290f24907711747cd977ee420ed/extensions/threat/surge-rule.conf,REJECT
 
+GEOIP,VN,DIRECT
+FINAL,DIRECT
+
 [Header Rewrite]
 # === FIREBASE REMOTE CONFIG & REVENUECAT CACHE-BUST (LOCKET GOLD 45S + RC APPS) ===
 ^https?:\/\/firebaseremoteconfig\.googleapis\.com\/.+ header-del If-None-Match
